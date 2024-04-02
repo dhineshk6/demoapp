@@ -1,89 +1,61 @@
+import pypyodbc
 import xml.etree.ElementTree as ET
-import mysql.connector  # Replace with your SQL library if needed
 
-def get_keyword_from_xml(xml_file):
-  """
-  Parses the specified XML file and returns the value of the first element with the 'keyword' tag.
+# Function to execute SQL queries in Sybase DB
+def execute_sql_queries(connection_string, queries):
+    try:
+        conn = pypyodbc.connect(connection_string)
+        cursor = conn.cursor()
 
-  Args:
-      xml_file (str): Path to the XML file.
+        for query in queries:
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            print("Results for query:", query)
+            for row in rows:
+                print(row)
 
-  Returns:
-      str: The keyword value from the XML file, or None if not found.
-  """
-  try:
-    tree = ET.parse(xml_file)
-    root = tree.getroot()
-    return root.find('keyword').text
-  except FileNotFoundError:
-    print(f"Error: XML file '{xml_file}' not found.")
-    return None
-  except Exception as e:
-    print(f"Error parsing XML file: {e}")
-    return None
+        cursor.close()
+        conn.close()
+    except pypyodbc.Error as e:
+        print("Database error:", e)
 
-def execute_sql_query(sql_query, sql_params):
-  """
-  Executes the provided SQL query with the given parameters and returns all results as a list of dictionaries.
+# Function to compare keywords from XML with SQL query outputs
+def compare_keywords_with_sql_output(xml_file, keywords):
+    try:
+        tree = ET.parse(xml_file)
+        root = tree.getroot()
 
-  Args:
-      sql_query (str): The SQL query to execute.
-      sql_params (tuple): A tuple containing the parameters for the query (optional).
+        for keyword in keywords:
+            found = False
+            for child in root.iter():
+                if child.text == keyword:
+                    found = True
+                    break
+            if found:
+                print(f"Keyword '{keyword}' found in XML")
+            else:
+                print(f"Keyword '{keyword}' not found in XML")
 
-  Returns:
-      list: A list of dictionaries containing the results from the query, with column names as keys.
-  """
-  # Replace with your preferred SQL library connection and execution logic
-  try:
-    connection = mysql.connector.connect(  # Replace connection details
-        host="localhost",
-        user="your_username",
-        password="your_password",
-        database="your_database"
-    )
-    cursor = connection.cursor()
-    cursor.execute(sql_query, sql_params)
-    column_names = [desc[0] for desc in cursor.description]  # Get column names
-    results = [dict(zip(column_names, row)) for row in cursor.fetchall()]
-    connection.close()
-    return results
-  except Exception as e:
-    print(f"Error executing SQL query: {e}")
-    return []
+    except ET.ParseError as e:
+        print("Error parsing XML:", e)
 
-def main():
-  xml_file = "your_file.xml"  # Replace with your XML file path
-  sql_queries = [  # List of SQL queries to execute
-      "SELECT * FROM table1 WHERE id = %s",
-      "SELECT * FROM table2 WHERE key = %s"
-  ]
-  sql_params = (1,)  # Replace with your SQL query parameter (optional)
-
-  keyword = get_keyword_from_xml(xml_file)
-  if keyword:
-    all_results = []
-    for query in sql_queries:
-      results = execute_sql_query(query, sql_params)
-      all_results.extend(results)  # Combine results from all queries
-
-    if all_results:
-      print(f"Keyword from XML: {keyword}")
-      print("SQL Query Results:")
-      for result in all_results:
-        print(result)  # Print entire dictionary for each row
-      match_found = False
-      for result in all_results:
-        if keyword in result.values():  # Check if keyword exists in any column value
-          match_found = True
-          break
-      if match_found:
-        print("Keyword matches at least one value in SQL query output!")
-      else:
-        print("Keyword does not match any value in SQL query output.")
-    else:
-      print("No results found from any SQL queries.")
-  else:
-    print("Error retrieving keyword from XML file.")
-
+# Main function
 if __name__ == "__main__":
-  main()
+    # Define your Sybase connection string
+    sybase_connection_string = "DRIVER={Adaptive Server Enterprise};SERVER=<your_server_name>;PORT=<your_port>;DATABASE=<your_database>;UID=<your_username>;PWD=<your_password>"
+
+    # Define SQL queries to execute
+    sql_queries = [
+        "SELECT * FROM your_table_1",
+        "SELECT * FROM your_table_2"
+    ]
+
+    # Define keywords to compare with XML
+    xml_file_path = "your_xml_file.xml"
+    keywords_to_compare = ["keyword1", "keyword2", "keyword3"]
+
+    # Execute SQL queries
+    execute_sql_queries(sybase_connection_string, sql_queries)
+
+    # Compare keywords with XML
+    compare_keywords_with_sql_output(xml_file_path, keywords_to_compare)
