@@ -1,5 +1,12 @@
-import xml.etree.ElementTree as ET
 import sybpydb
+import sys
+
+# Check if the correct number of arguments is provided
+if len(sys.argv) != 2:
+    print("Usage: python script.py <log_file_path>")
+    sys.exit(1)
+
+log_file_path = sys.argv[1]
 
 # Define your database connection parameters
 connection_params = {
@@ -13,33 +20,31 @@ connection_params = {
 # Establish database connection
 conn = sybpydb.connect(**connection_params)
 
-# Define your SQL queries
-sql_queries = [
-    "SELECT column1 FROM your_table1 WHERE condition",
-    "SELECT column2 FROM your_table2 WHERE condition",
-    # Add more queries as needed
-]
+# Define your SQL query
+sql_query = "SELECT your_column FROM your_table WHERE condition"
 
-# Execute SQL queries
-results = []
-for query in sql_queries:
-    cursor = conn.cursor()
-    cursor.execute(query)
-    result = cursor.fetchone()[0]  # Assuming you are fetching a single value
-    results.append(result)
-    cursor.close()
+# Execute SQL query
+cursor = conn.cursor()
+cursor.execute(sql_query)
+sql_result = cursor.fetchone()[0]  # Assuming you are fetching a single value
+cursor.close()
 
 # Close the database connection
 conn.close()
 
-# Read the particular number from XML file
-tree = ET.parse('your_xml_file.xml')
-root = tree.getroot()
-xml_number = int(root.find('.//number').text)  # Replace 'number' with the actual tag name
+# Read value from log file
+log_value = None
+with open(log_file_path, 'r') as log_file:
+    for line in log_file:
+        if line.strip() == 'desired_value':
+            log_value = line.strip()
+            break
 
-# Compare SQL results with XML number
-for i, result in enumerate(results):
-    if result == xml_number:
-        print(f"Query {i+1}: Match! Number from XML: {xml_number}, Number from SQL: {result}")
+# Compare SQL result with value from log file
+if log_value is not None:
+    if sql_result == log_value:
+        print(f"Match! Value from Log: {log_value}, Value from SQL: {sql_result}")
     else:
-        print(f"Query {i+1}: Mismatch! Number from XML: {xml_number}, Number from SQL: {result}")
+        print(f"Mismatch! Value from Log: {log_value}, Value from SQL: {sql_result}")
+else:
+    print("Desired value not found in log file.")
