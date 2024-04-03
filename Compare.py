@@ -1,64 +1,65 @@
+import pymssql
 import xml.etree.ElementTree as ET
-import pyodbc
 
-# Function to execute SQL queries in Sybase DB
-def execute_sql_queries(connection_string, queries):
-    try:
-        conn = pyodbc.connect(connection_string)
-        cursor = conn.cursor()
+# Function to establish connection to Sybase database
+def connect_to_db(server, database, username, password):
+    conn = pymssql.connect(server, username, password, database)
+    cursor = conn.cursor()
+    return conn, cursor
 
-        results = []
-        for query in queries:
-            cursor.execute(query)
-            rows = cursor.fetchall()
-            results.append(rows)
+# Function to execute SQL queries and return results
+def execute_sql(cursor, sql):
+    cursor.execute(sql)
+    return cursor.fetchall()
 
-        cursor.close()
-        conn.close()
-        return results
+# Function to compare XML numbers with SQL query output
+def compare_xml_with_sql(xml_data, sql_results):
+    xml_numbers = [int(node.text) for node in xml_data.findall('.//number')]
+    sql_numbers = [result[0] for result in sql_results]
+    return xml_numbers == sql_numbers
 
-    except pyodbc.Error as e:
-        print("Database error:", e)
-        return None
-
-# Function to compare the number from XML with SQL query outputs
-def compare_number_with_sql_output(xml_file, expected_number, results):
-    try:
-        tree = ET.parse(xml_file)
-        root = tree.getroot()
-
-        xml_number = int(root.find('number').text)
-
-        sql_output_sum = sum(len(rows) for rows in results)
-        
-        if xml_number == sql_output_sum == expected_number:
-            print("The number from XML matches the sum of SQL query outputs.")
-        else:
-            print("The number from XML does not match the sum of SQL query outputs.")
-
-    except ET.ParseError as e:
-        print("Error parsing XML:", e)
+# Function to parse XML from file
+def parse_xml_from_file(file_path):
+    tree = ET.parse(file_path)
+    return tree.getroot()
 
 # Main function
-if __name__ == "__main__":
-    # Define your Sybase connection string
-    sybase_connection_string = "DRIVER={Adaptive Server Enterprise};SERVER=<your_server_name>;PORT=<your_port>;DATABASE=<your_database>;UID=<your_username>;PWD=<your_password>"
+def main():
+    # Database connection parameters
+    server = 'your_server'
+    database = 'your_database'
+    username = 'your_username'
+    password = 'your_password'
 
-    # Define SQL queries to execute
+    # Path to XML file
+    xml_file_path = 'path_to_your_xml_file.xml'
+
+    # SQL queries
     sql_queries = [
-        "SELECT * FROM your_table_1",
-        "SELECT * FROM your_table_2"
+        "SELECT COUNT(*) FROM your_table WHERE condition1",
+        "SELECT COUNT(*) FROM your_table WHERE condition2",
+        # Add more queries as needed
     ]
 
-    # Define the expected number from XML
-    expected_number_from_xml = 10
+    try:
+        # Connect to the database
+        conn, cursor = connect_to_db(server, database, username, password)
 
-    # Define XML file path
-    xml_file_path = "your_xml_file.xml"
+        # Parse XML from file
+        xml_data = parse_xml_from_file(xml_file_path)
 
-    # Execute SQL queries
-    sql_results = execute_sql_queries(sybase_connection_string, sql_queries)
+        # Execute SQL queries and compare with XML data
+        for sql_query in sql_queries:
+            sql_results = execute_sql(cursor, sql_query)
+            result = compare_xml_with_sql(xml_data, sql_results)
+            print(f"Comparison result for query '{sql_query}': {result}")
 
-    if sql_results is not None:
-        # Compare number with SQL output
-        compare_number_with_sql_output(xml_file_path, expected_number_from_xml, sql_results)
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+    finally:
+        # Close connection
+        if conn:
+            conn.close()
+
+if __name__ == "__main__":
+    main()
