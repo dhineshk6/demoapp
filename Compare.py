@@ -1,48 +1,48 @@
-import custom_sql_connector as sql
 import xml.etree.ElementTree as ET
+import pyodbc
 
-# Function to execute SQL queries
-def execute_sql_queries(connection, queries):
+# Function to execute SQL queries in Sybase DB
+def execute_sql_queries(connection_string, queries):
     try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+
         results = []
         for query in queries:
-            result = connection.execute(query)
-            rows = result.fetchall()
+            cursor.execute(query)
+            rows = cursor.fetchall()
             results.append(rows)
+
+        cursor.close()
+        conn.close()
         return results
-    except Exception as e:
-        print("Error executing SQL query:", e)
+
+    except pyodbc.Error as e:
+        print("Database error:", e)
         return None
 
-# Function to compare numbers from XML with SQL query outputs
-def compare_numbers_with_sql_output(xml_file, expected_numbers, results):
+# Function to compare the number from XML with SQL query outputs
+def compare_number_with_sql_output(xml_file, expected_number, results):
     try:
         tree = ET.parse(xml_file)
         root = tree.getroot()
 
-        # Retrieve numbers from XML
-        xml_numbers = [int(element.text) for element in root.findall('number')]
+        xml_number = int(root.find('number').text)
 
-        # Check if the number of XML numbers matches the number of SQL queries executed
-        if len(xml_numbers) != len(results):
-            print("Error: Number of XML numbers does not match the number of SQL queries.")
-            return
-
-        # Compare each number from XML with the corresponding SQL output
-        for i, xml_number in enumerate(xml_numbers):
-            sql_output_sum = sum(len(rows) for rows in results[i])
-            if xml_number == sql_output_sum == expected_numbers[i]:
-                print(f"XML number {i+1} matches the sum of SQL query {i+1} outputs.")
-            else:
-                print(f"XML number {i+1} does not match the sum of SQL query {i+1} outputs.")
+        sql_output_sum = sum(len(rows) for rows in results)
+        
+        if xml_number == sql_output_sum == expected_number:
+            print("The number from XML matches the sum of SQL query outputs.")
+        else:
+            print("The number from XML does not match the sum of SQL query outputs.")
 
     except ET.ParseError as e:
         print("Error parsing XML:", e)
 
 # Main function
 if __name__ == "__main__":
-    # Create your SQL connection
-    sql_connection = sql.create_connection("<connection_parameters>")
+    # Define your Sybase connection string
+    sybase_connection_string = "DRIVER={Adaptive Server Enterprise};SERVER=<your_server_name>;PORT=<your_port>;DATABASE=<your_database>;UID=<your_username>;PWD=<your_password>"
 
     # Define SQL queries to execute
     sql_queries = [
@@ -50,18 +50,15 @@ if __name__ == "__main__":
         "SELECT * FROM your_table_2"
     ]
 
-    # Define the expected numbers from XML
-    expected_numbers_from_xml = [10, 20]  # Example: [10, 20] means we expect two numbers, 10 and 20.
+    # Define the expected number from XML
+    expected_number_from_xml = 10
 
     # Define XML file path
     xml_file_path = "your_xml_file.xml"
 
     # Execute SQL queries
-    sql_results = execute_sql_queries(sql_connection, sql_queries)
+    sql_results = execute_sql_queries(sybase_connection_string, sql_queries)
 
     if sql_results is not None:
-        # Compare numbers with SQL output
-        compare_numbers_with_sql_output(xml_file_path, expected_numbers_from_xml, sql_results)
-
-    # Close SQL connection
-    sql.close_connection(sql_connection)
+        # Compare number with SQL output
+        compare_number_with_sql_output(xml_file_path, expected_number_from_xml, sql_results)
