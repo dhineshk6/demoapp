@@ -1,65 +1,45 @@
-import pymssql
 import xml.etree.ElementTree as ET
+import sybpydb
 
-# Function to establish connection to Sybase database
-def connect_to_db(server, database, username, password):
-    conn = pymssql.connect(server, username, password, database)
+# Define your database connection parameters
+connection_params = {
+    'userid': 'your_username',
+    'password': 'your_password',
+    'servername': 'your_server',
+    'port': 5000,  # Adjust port number if necessary
+    'dbname': 'your_db'
+}
+
+# Establish database connection
+conn = sybpydb.connect(**connection_params)
+
+# Define your SQL queries
+sql_queries = [
+    "SELECT column1 FROM your_table1 WHERE condition",
+    "SELECT column2 FROM your_table2 WHERE condition",
+    # Add more queries as needed
+]
+
+# Execute SQL queries
+results = []
+for query in sql_queries:
     cursor = conn.cursor()
-    return conn, cursor
+    cursor.execute(query)
+    result = cursor.fetchone()[0]  # Assuming you are fetching a single value
+    results.append(result)
+    cursor.close()
 
-# Function to execute SQL queries and return results
-def execute_sql(cursor, sql):
-    cursor.execute(sql)
-    return cursor.fetchall()
+# Close the database connection
+conn.close()
 
-# Function to compare XML numbers with SQL query output
-def compare_xml_with_sql(xml_data, sql_results):
-    xml_numbers = [int(node.text) for node in xml_data.findall('.//number')]
-    sql_numbers = [result[0] for result in sql_results]
-    return xml_numbers == sql_numbers
+# Read the particular number from XML file
+tree = ET.parse('your_xml_file.xml')
+root = tree.getroot()
+xml_number = int(root.find('.//number').text)  # Replace 'number' with the actual tag name
 
-# Function to parse XML from file
-def parse_xml_from_file(file_path):
-    tree = ET.parse(file_path)
-    return tree.getroot()
-
-# Main function
-def main():
-    # Database connection parameters
-    server = 'your_server'
-    database = 'your_database'
-    username = 'your_username'
-    password = 'your_password'
-
-    # Path to XML file
-    xml_file_path = 'path_to_your_xml_file.xml'
-
-    # SQL queries
-    sql_queries = [
-        "SELECT COUNT(*) FROM your_table WHERE condition1",
-        "SELECT COUNT(*) FROM your_table WHERE condition2",
-        # Add more queries as needed
-    ]
-
-    try:
-        # Connect to the database
-        conn, cursor = connect_to_db(server, database, username, password)
-
-        # Parse XML from file
-        xml_data = parse_xml_from_file(xml_file_path)
-
-        # Execute SQL queries and compare with XML data
-        for sql_query in sql_queries:
-            sql_results = execute_sql(cursor, sql_query)
-            result = compare_xml_with_sql(xml_data, sql_results)
-            print(f"Comparison result for query '{sql_query}': {result}")
-
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
-    finally:
-        # Close connection
-        if conn:
-            conn.close()
-
-if __name__ == "__main__":
-    main()
+# Compare SQL results with XML number
+for i, result in enumerate(results):
+    if result == xml_number:
+        print(f"Query {i+1}: Match! Number from XML: {xml_number}, Number from SQL: {result}")
+    else:
+        print(f"Query {i+1}: Mismatch! Number from XML: {xml_number}, Number from SQL: {result}")
