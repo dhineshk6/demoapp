@@ -12,6 +12,9 @@ connection_params = {
 # Define the log file path
 log_file_path = '/path/to/your/log_file.log'  # Update with the actual path to your log file
 
+# Define the particular value from the log file
+desired_log_value = 'desired_value'  # Update with the desired value from the log file
+
 # Define your SQL queries
 sql_queries = [
     "SELECT column1 FROM your_table1 WHERE condition1",
@@ -34,17 +37,9 @@ for query in sql_queries:
 # Close the database connection
 conn.close()
 
-# Read value from log file
-log_value = None
-with open(log_file_path, 'r') as log_file:
-    for line in log_file:
-        if line.strip() == 'desired_value':
-            log_value = line.strip()
-            break
-
-# Compare SQL results with value from log file
-for i, (sql_result, query_result) in enumerate(zip(log_value, query_results), start=1):
-    if sql_result == query_result:
-        print(f"Query {i}: Match! Value from Log: {sql_result}, Value from SQL: {query_result}")
+# Compare SQL results with the particular value from the log file
+for i, query_result in enumerate(query_results, start=1):
+    if desired_log_value == str(query_result):  # Comparing log value with each SQL query result
+        print(f"Query {i}: Match! Desired Value from Log: {desired_log_value}, Value from SQL: {query_result}")
     else:
-        print(f"Query {i}: Mismatch! Value from Log: {sql_result}, Value from SQL: {query_result}")
+        print(f"Query {i}: Mismatch! Desired Value from Log: {desired_log_value}, Value from SQL: {query_result}")
