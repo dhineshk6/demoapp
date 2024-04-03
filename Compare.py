@@ -1,12 +1,4 @@
 import sybpydb
-import sys
-
-# Check if the correct number of arguments is provided
-if len(sys.argv) != 2:
-    print("Usage: python script.py <log_file_path>")
-    sys.exit(1)
-
-log_file_path = sys.argv[1]
 
 # Define your database connection parameters
 connection_params = {
@@ -17,17 +9,27 @@ connection_params = {
     'dbname': 'your_db'
 }
 
+# Define the log file path
+log_file_path = '/path/to/your/log_file.log'  # Update with the actual path to your log file
+
+# Define your SQL queries
+sql_queries = [
+    "SELECT column1 FROM your_table1 WHERE condition1",
+    "SELECT column2 FROM your_table2 WHERE condition2",
+    # Add more queries as needed
+]
+
 # Establish database connection
 conn = sybpydb.connect(**connection_params)
 
-# Define your SQL query
-sql_query = "SELECT your_column FROM your_table WHERE condition"
-
-# Execute SQL query
-cursor = conn.cursor()
-cursor.execute(sql_query)
-sql_result = cursor.fetchone()[0]  # Assuming you are fetching a single value
-cursor.close()
+# Execute SQL queries
+query_results = []
+for query in sql_queries:
+    cursor = conn.cursor()
+    cursor.execute(query)
+    result = cursor.fetchone()[0]  # Assuming you are fetching a single value
+    query_results.append(result)
+    cursor.close()
 
 # Close the database connection
 conn.close()
@@ -40,11 +42,9 @@ with open(log_file_path, 'r') as log_file:
             log_value = line.strip()
             break
 
-# Compare SQL result with value from log file
-if log_value is not None:
-    if sql_result == log_value:
-        print(f"Match! Value from Log: {log_value}, Value from SQL: {sql_result}")
+# Compare SQL results with value from log file
+for i, (sql_result, query_result) in enumerate(zip(log_value, query_results), start=1):
+    if sql_result == query_result:
+        print(f"Query {i}: Match! Value from Log: {sql_result}, Value from SQL: {query_result}")
     else:
-        print(f"Mismatch! Value from Log: {log_value}, Value from SQL: {sql_result}")
-else:
-    print("Desired value not found in log file.")
+        print(f"Query {i}: Mismatch! Value from Log: {sql_result}, Value from SQL: {query_result}")
