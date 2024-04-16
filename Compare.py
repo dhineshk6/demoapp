@@ -1,6 +1,7 @@
 def compare_log_files():
     """
-    Compare two log files and print matching and mismatching scheduled IDs and their values.
+    Compare two log files and print all matching scheduled IDs and their values.
+    If a scheduled ID is not matching, print its value from both files.
     """
     file1_path = "file1.log"  # Hardcoded file path for file 1
     file2_path = "file2.log"  # Hardcoded file path for file 2
@@ -34,24 +35,21 @@ def compare_log_files():
     common_ids = set(file1_data.keys()) & set(file2_data.keys())
     print("Common IDs:", common_ids)
 
-    matching_ids = [scheduled_id for scheduled_id in common_ids if file1_data[scheduled_id] == file2_data[scheduled_id]]
-    print("Matching IDs:", matching_ids)
-
-    mismatching_ids = [scheduled_id for scheduled_id in common_ids if file1_data[scheduled_id] != file2_data[scheduled_id]]
-    print("Mismatching IDs:", mismatching_ids)
-
     with open(output_file, 'w') as output:
         output.write("Matching scheduled IDs and their values:\n")
-        for scheduled_id in matching_ids:
-            output.write(f"{scheduled_id}: {file1_data[scheduled_id]}; {file2_data[scheduled_id]}\n")
-        if matching_ids:
-            output.write("\n")
+        for scheduled_id in common_ids:
+            if file1_data.get(scheduled_id) == file2_data.get(scheduled_id):
+                output.write(f"{scheduled_id}: {file1_data.get(scheduled_id)}; {file2_data.get(scheduled_id)}\n")
 
-        output.write("Mismatching scheduled IDs and their values:\n")
-        for scheduled_id in mismatching_ids:
-            output.write(f"{scheduled_id}: {file1_data.get(scheduled_id, 'Not found')}; {file2_data.get(scheduled_id, 'Not found')}\n")
-        if mismatching_ids:
-            output.write("\n")
+        output.write("\nNot matching scheduled IDs and their values from File 1:\n")
+        for scheduled_id, value in file1_data.items():
+            if scheduled_id not in common_ids:
+                output.write(f"{scheduled_id}: {value}\n")
+
+        output.write("\nNot matching scheduled IDs and their values from File 2:\n")
+        for scheduled_id, value in file2_data.items():
+            if scheduled_id not in common_ids:
+                output.write(f"{scheduled_id}: {value}\n")
 
 # Usage example:
 compare_log_files()
