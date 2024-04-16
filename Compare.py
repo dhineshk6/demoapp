@@ -34,27 +34,16 @@ def compare_log_files():
     common_ids = set(file1_data.keys()) & set(file2_data.keys())
     print("Common IDs:", common_ids)
 
-    matching_ids = {scheduled_id: file1_data[scheduled_id] for scheduled_id in common_ids if file1_data[scheduled_id] == file2_data.get(scheduled_id)}
-    print("Matching IDs:", matching_ids)
-
-    mismatching_ids_file1 = {scheduled_id: file1_data[scheduled_id] for scheduled_id in common_ids if file1_data[scheduled_id] != file2_data.get(scheduled_id)}
-    print("Mismatching IDs in File 1:", mismatching_ids_file1)
-
-    mismatching_ids_file2 = {scheduled_id: file2_data[scheduled_id] for scheduled_id in common_ids if file1_data.get(scheduled_id) != file2_data[scheduled_id]}
-    print("Mismatching IDs in File 2:", mismatching_ids_file2)
-
     with open(output_file, 'w') as output:
         output.write("Matching scheduled IDs and their values:\n")
-        for scheduled_id, value in matching_ids.items():
-            output.write(f"{scheduled_id}: {value}\n")
+        for scheduled_id in common_ids:
+            if file1_data.get(scheduled_id) == file2_data.get(scheduled_id):
+                output.write(f"{scheduled_id}: {file1_data.get(scheduled_id)}; {file2_data.get(scheduled_id)}\n")
 
-        output.write("\nMismatching scheduled IDs and their values from File 1:\n")
-        for scheduled_id, value in mismatching_ids_file1.items():
-            output.write(f"{scheduled_id}: {value}\n")
-
-        output.write("\nMismatching scheduled IDs and their values from File 2:\n")
-        for scheduled_id, value in mismatching_ids_file2.items():
-            output.write(f"{scheduled_id}: {value}\n")
+        output.write("\nMismatching scheduled IDs and their values:\n")
+        for scheduled_id in common_ids:
+            if file1_data.get(scheduled_id) != file2_data.get(scheduled_id):
+                output.write(f"{scheduled_id}: {file1_data.get(scheduled_id)}; {file2_data.get(scheduled_id)}\n")
 
 # Usage example:
 compare_log_files()
