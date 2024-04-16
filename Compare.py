@@ -52,16 +52,16 @@ if __name__ == "__main__":
     
     print("Schedule IDs, Times, Months, and Dates from File 1:")
     for schedule_id, schedule_time, month_date in log1_data:
-        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date}")
+        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date if month_date else 'N/A'}")
 
     print("\nSchedule IDs, Times, Months, and Dates from File 2:")
     for schedule_id, schedule_time, month_date in log2_data:
-        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date}")
+        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date if month_date else 'N/A'}")
 
     print("\nMatching:")
     for schedule_id, schedule_time, month_date in matching:
-        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date}")
+        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date if month_date else 'N/A'}")
 
     print("\nMismatching:")
     for schedule_id, schedule_time, month_date in mismatching:
-        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date}")
+        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date if month_date else 'N/A'}")
