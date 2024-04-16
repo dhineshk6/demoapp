@@ -24,21 +24,33 @@ def compare_log_files():
                             scheduled_ids[schedule_pair[0].strip()] = schedule_pair[1].strip()
         return scheduled_ids
 
-    with open(file1_path, 'r') as file1, open(file2_path, 'r') as file2, open(output_file, 'w') as output:
-        file1_data = read_log_file(file1_path)
-        file2_data = read_log_file(file2_path)
+    print("Reading file 1:", file1_path)
+    file1_data = read_log_file(file1_path)
+    print("File 1 data:", file1_data)
 
-        common_ids = set(file1_data.keys()) & set(file2_data.keys())
+    print("Reading file 2:", file2_path)
+    file2_data = read_log_file(file2_path)
+    print("File 2 data:", file2_data)
 
-        matching_ids = [scheduled_id for scheduled_id in common_ids if file1_data[scheduled_id] == file2_data[scheduled_id]]
+    common_ids = set(file1_data.keys()) & set(file2_data.keys())
+    print("Common IDs:", common_ids)
+
+    matching_ids = [scheduled_id for scheduled_id in common_ids if file1_data[scheduled_id] == file2_data[scheduled_id]]
+    print("Matching IDs:", matching_ids)
+
+    mismatching_ids = [scheduled_id for scheduled_id in common_ids if file1_data[scheduled_id] != file2_data[scheduled_id]]
+    print("Mismatching IDs:", mismatching_ids)
+
+    with open(output_file, 'w') as output:
         output.write("Matching scheduled IDs and their values:\n")
         for scheduled_id in matching_ids:
-            output.write(f"{scheduled_id}: {file1_data[scheduled_id]};\n")  # Ensure the output format matches input
+            output.write(f"{scheduled_id}: {file1_data[scheduled_id]};\n")
 
-        mismatching_ids = [scheduled_id for scheduled_id in common_ids if file1_data[scheduled_id] != file2_data[scheduled_id]]
         output.write("\nNot matching scheduled IDs and their values:\n")
         for scheduled_id in mismatching_ids:
-            output.write(f"{scheduled_id}: {file1_data.get(scheduled_id, 'Not found')}; {file2_data.get(scheduled_id, 'Not found')};\n")  # Ensure the output format matches input
+            output.write(f"{scheduled_id}: {file1_data.get(scheduled_id, 'Not found')}; {file2_data.get(scheduled_id, 'Not found')};\n")
+
+    print("Comparison output written to:", output_file)
 
 # Usage example:
 compare_log_files()
