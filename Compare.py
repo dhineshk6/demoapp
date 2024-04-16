@@ -7,18 +7,21 @@ def parse_log_line(line):
     parts = line.split('scheduleID=')
     if len(parts) < 2:
         return None, None, None, None
+    
     schedule_id, rest = parts[1].split(',', 1)
     
     time_parts = rest.split('scheduleTime=')
     if len(time_parts) < 2:
         return None, None, None, None
-    schedule_time, _ = time_parts[1].split(',', 1)
+    
+    schedule_time, rest = time_parts[1].split(',', 1)
 
     # Extracting month and date
-    month_date = None
     match = re.search(r'(\w{3}\s+\d{1,2})', line)
     if match:
         month_date = match.group(1)
+    else:
+        month_date = None
 
     return schedule_id.strip(), schedule_time.strip(), month_date.strip() if month_date else 'N/A', None
 
