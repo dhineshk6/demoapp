@@ -20,7 +20,7 @@ def parse_log_line(line):
     if match:
         month_date = match.group(1)
 
-    return schedule_id.strip(), schedule_time.strip(), month_date.strip() if month_date else None
+    return schedule_id.strip(), schedule_time.strip(), month_date.strip() if month_date else 'N/A', None
 
 def compare_logs(log1_path, log2_path):
     """
@@ -51,12 +51,12 @@ if __name__ == "__main__":
     log1_data, log2_data, matching, mismatching = compare_logs(log1_path, log2_path)
     
     print("Schedule IDs, Times, Months, and Dates from File 1:")
-    for schedule_id, schedule_time, month_date in log1_data:
-        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date if month_date else 'N/A'}")
+    for schedule_id, schedule_time, month_date, _ in log1_data:
+        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date}")
 
     print("\nSchedule IDs, Times, Months, and Dates from File 2:")
-    for schedule_id, schedule_time, month_date in log2_data:
-        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date if month_date else 'N/A'}")
+    for schedule_id, schedule_time, month_date, _ in log2_data:
+        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date}")
 
     print("\nMatching:")
     for schedule_id, schedule_time in matching:
