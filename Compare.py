@@ -13,7 +13,7 @@ def read_log_file(file_path):
 
 def compare_log_files():
     """
-    Compare two log files and check if they have the same values for the scheduled IDs.
+    Compare two log files and print matching and mismatching scheduled IDs and their values.
     """
     file1_path = "file1.log"  # Hardcoded file path for file 1
     file2_path = "file2.log"  # Hardcoded file path for file 2
@@ -25,16 +25,17 @@ def compare_log_files():
 
         common_ids = set(file1_data.keys()) & set(file2_data.keys())
 
-        mismatched_ids = [scheduled_id for scheduled_id in common_ids if file1_data[scheduled_id] != file2_data[scheduled_id]]
+        output.write("Matching scheduled IDs and their values:\n")
+        for scheduled_id in common_ids:
+            if file1_data[scheduled_id] == file2_data[scheduled_id]:
+                output.write(f"{scheduled_id}: {file1_data[scheduled_id]}\n")
 
-        if mismatched_ids:
-            output.write("Mismatched scheduled IDs:\n")
-            for scheduled_id in mismatched_ids:
-                output.write(f"Scheduled ID {scheduled_id} has different values in the two log files:\n")
-                output.write(f"File 1: {file1_data[scheduled_id]}\n")
-                output.write(f"File 2: {file2_data[scheduled_id]}\n\n")
-        else:
-            output.write("All scheduled IDs match between the two log files.\n")
+        output.write("\nMismatching scheduled IDs and their values:\n")
+        for scheduled_id in common_ids:
+            if file1_data.get(scheduled_id) != file2_data.get(scheduled_id):
+                output.write(f"{scheduled_id}: \n")
+                output.write(f"  File 1: {file1_data.get(scheduled_id)}\n")
+                output.write(f"  File 2: {file2_data.get(scheduled_id)}\n")
 
 # Usage example:
 compare_log_files()
