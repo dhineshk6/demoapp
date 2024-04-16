@@ -55,13 +55,4 @@ if __name__ == "__main__":
         print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date}")
 
     print("\nSchedule IDs, Times, Months, and Dates from File 2:")
-    for schedule_id, schedule_time, month_date, _ in log2_data:
-        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date}")
-
-    print("\nMatching:")
-    for schedule_id, schedule_time in matching:
-        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}")
-
-    print("\nMismatching:")
-    for schedule_id, schedule_time in mismatching:
-        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}")
+    for schedule_id, schedule_time, month_date, _ in l
