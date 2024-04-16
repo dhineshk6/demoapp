@@ -27,12 +27,15 @@ def compare_schedule_ids(log_files):
     mismatching_values = {}
     for schedule_id in schedules[log_files[0]]:
         values = [schedules[file_path].get(schedule_id) for file_path in log_files]
+        print(f"Comparing values for ScheduleID {schedule_id}: {values}")  # Debugging statement
         if all(values):
             if len(set(values)) == 1:
                 matching_values[schedule_id] = values[0]
             else:
                 mismatching_values[schedule_id] = values
 
+    print("Matching Values:", matching_values)  # Debugging statement
+    print("Mismatching Values:", mismatching_values)  # Debugging statement
     return matching_values, mismatching_values
 
 def write_output(matching_values, mismatching_values, output_file):
