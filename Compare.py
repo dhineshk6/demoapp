@@ -51,4 +51,6 @@ if __name__ == "__main__":
     output_file = "output.txt"  # Update with your desired output file path
 
     matching_values, mismatching_values = compare_schedule_ids(log_files)
+    print("Matching Values:", matching_values)  # Debugging statement
+    print("Mismatching Values:", mismatching_values)  # Debugging statement
     write_output(matching_values, mismatching_values, output_file)
