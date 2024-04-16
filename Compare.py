@@ -45,9 +45,5 @@ def compare_log_files():
         for scheduled_id in matching_ids:
             output.write(f"{scheduled_id}: {file1_data[scheduled_id]};\n")
 
-        output.write("\nNot matching scheduled IDs and their values:\n")
-        for scheduled_id in mismatching_ids:
-            output.write(f"{scheduled_id}: {file1_data.get(scheduled_id, 'Not found')}; {file2_data.get(scheduled_id, 'Not found')};\n")
-
 # Usage example:
 compare_log_files()
