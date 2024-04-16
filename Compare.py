@@ -1,13 +1,20 @@
 def read_log_file(file_path):
-    """
-    Read a log file and return a dictionary with scheduled IDs as keys and their corresponding values.
-    """
+    
     scheduled_ids = {}
     with open(file_path, 'r') as file:
         for line in file:
-            parts = line.strip().split(': ')
-            if len(parts) == 2:
-                scheduled_id, value = parts
+            parts = line.strip().split('; ')
+            scheduled_id = None
+            value = None
+            for part in parts:
+                key_value = part.split(': ')
+                if len(key_value) == 2:
+                    key, val = key_value
+                    if key.strip() == "scheduledID":
+                        scheduled_id = val.strip()
+                    elif key.strip() == "value":
+                        value = val.strip()
+            if scheduled_id is not None and value is not None:
                 scheduled_ids[scheduled_id] = value
     return scheduled_ids
 
