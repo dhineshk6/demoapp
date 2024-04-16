@@ -14,7 +14,7 @@ def parse_log_line(line):
     if len(time_parts) < 2:
         return None, None, None, None
     
-    schedule_time, rest = time_parts[1].split(',', 1)
+    schedule_time, _ = time_parts[1].split(',', 1)
 
     # Extracting month and date
     match = re.search(r'(\w{3}\s+\d{1,2})', line)
