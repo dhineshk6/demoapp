@@ -9,6 +9,7 @@ def extract_schedule_ids(file_path):
             if schedule_match and value_match:
                 schedule_id = schedule_match.group(1)
                 schedule_value = value_match.group(1)
+                print(f"Extracted: ScheduleID={schedule_id}, Value={schedule_value}")
                 schedule_ids[schedule_id] = schedule_value
     return schedule_ids
 
