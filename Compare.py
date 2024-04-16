@@ -1,5 +1,8 @@
 def read_log_file(file_path):
-    
+    """
+    Read a log file and return a dictionary with scheduled IDs as keys and their corresponding values.
+    Exclude time, process ID, memory usage, and file descriptors from the log.
+    """
     scheduled_ids = {}
     with open(file_path, 'r') as file:
         for line in file:
@@ -32,17 +35,17 @@ def compare_log_files():
 
         common_ids = set(file1_data.keys()) & set(file2_data.keys())
 
+        matching_ids = [scheduled_id for scheduled_id in common_ids if file1_data[scheduled_id] == file2_data[scheduled_id]]
         output.write("Matching scheduled IDs and their values:\n")
-        for scheduled_id in common_ids:
-            if file1_data[scheduled_id] == file2_data[scheduled_id]:
-                output.write(f"{scheduled_id}: {file1_data[scheduled_id]}\n")
+        for scheduled_id in matching_ids:
+            output.write(f"{scheduled_id}: {file1_data[scheduled_id]} (Both files are matched)\n")
 
-        output.write("\nMismatching scheduled IDs and their values:\n")
-        for scheduled_id in common_ids:
-            if file1_data.get(scheduled_id) != file2_data.get(scheduled_id):
-                output.write(f"{scheduled_id}: \n")
-                output.write(f"  File 1: {file1_data.get(scheduled_id)}\n")
-                output.write(f"  File 2: {file2_data.get(scheduled_id)}\n")
+        mismatching_ids = [scheduled_id for scheduled_id in common_ids if file1_data[scheduled_id] != file2_data[scheduled_id]]
+        output.write("\nNot matching scheduled IDs and their values:\n")
+        for scheduled_id in mismatching_ids:
+            output.write(f"{scheduled_id}: \n")
+            output.write(f"  File 1: {file1_data[scheduled_id]}\n")
+            output.write(f"  File 2: {file2_data[scheduled_id]}\n")
 
 # Usage example:
 compare_log_files()
