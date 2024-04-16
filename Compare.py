@@ -1,13 +1,14 @@
-import re
+import regex as re
 
 def extract_schedule_ids(file_path):
     schedule_ids = {}
     with open(file_path, 'r') as file:
         for line in file:
-            match = re.search(r'scheduleID: (\w+);', line)
-            if match:
-                schedule_id = match.group(1)
-                schedule_value = re.search(r'value: (\w+);', line).group(1)
+            schedule_match = re.search(r'scheduleID: (\w+);', line)
+            value_match = re.search(r'value: (\w+);', line)
+            if schedule_match and value_match:
+                schedule_id = schedule_match.group(1)
+                schedule_value = value_match.group(1)
                 schedule_ids[schedule_id] = schedule_value
     return schedule_ids
 
