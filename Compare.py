@@ -12,6 +12,8 @@ def extract_schedule_ids(file_path):
                 if schedule_id not in schedule_ids:
                     schedule_ids[schedule_id] = []
                 schedule_ids[schedule_id].append(schedule_value)
+    
+    print(f"Extracted Schedule IDs from {file_path}: {schedule_ids}")  # Debugging statement
     return schedule_ids
 
 def compare_schedule_ids(log_files):
@@ -56,10 +58,14 @@ def write_output(matching_values, mismatching_values, output_file):
         print("Error occurred while writing to file:", e)
 
 if __name__ == "__main__":
-    log_files = ["log1.txt", "log2.txt"]  # Update with your log file paths
-    output_file = "output.txt"  # Update with your desired output file path
+    log_files = ["path/to/log1{{}}.txt", "path/to/log2{{}}.txt"]  # Update with your log file paths
+    output_file = "output{{}}.txt"  # Update with your desired output file path
 
-    matching_values, mismatching_values = compare_schedule_ids(log_files)
+    # Process log files
+    formatted_log_files = [file_path.format(i) for i, file_path in enumerate(log_files)]
+    output_file = output_file.format("")
+
+    matching_values, mismatching_values = compare_schedule_ids(formatted_log_files)
     print("Matching Values:", matching_values)  # Debugging statement
     print("Mismatching Values:", mismatching_values)  # Debugging statement
 
