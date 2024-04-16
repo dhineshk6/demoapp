@@ -44,8 +44,8 @@ def compare_log_files():
         output.write("\nNot matching scheduled IDs and their values:\n")
         for scheduled_id in mismatching_ids:
             output.write(f"{scheduled_id}: \n")
-            output.write(f"  File 1: {file1_data[scheduled_id]}\n")
-            output.write(f"  File 2: {file2_data[scheduled_id]}\n")
+            output.write(f"  File 1: {file1_data.get(scheduled_id)}\n")
+            output.write(f"  File 2: {file2_data.get(scheduled_id)}\n")
 
 # Usage example:
 compare_log_files()
