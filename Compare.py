@@ -6,7 +6,8 @@ def extract_schedule_ids(file_path):
         for line in file:
             schedule_match = re.search(r'scheduleID:\s*(\w+);', line)
             if schedule_match:
-                schedule_ids.add(schedule_match.group(1))
+                schedule_id = schedule_match.group(1)
+                schedule_ids.add(schedule_id)
     return schedule_ids
 
 def compare_schedule_ids(log_files):
