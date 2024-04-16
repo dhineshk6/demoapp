@@ -1,4 +1,4 @@
-import regex as re
+import re
 
 def extract_schedule_ids(file_path):
     schedule_ids = {}
@@ -9,7 +9,9 @@ def extract_schedule_ids(file_path):
             if schedule_match and value_match:
                 schedule_id = schedule_match.group(1)
                 schedule_value = value_match.group(1)
-                schedule_ids[schedule_id] = schedule_value
+                if schedule_id not in schedule_ids:
+                    schedule_ids[schedule_id] = []
+                schedule_ids[schedule_id].append(schedule_value)
     return schedule_ids
 
 def compare_schedule_ids(log_files):
@@ -17,48 +19,41 @@ def compare_schedule_ids(log_files):
     for file_path in log_files:
         schedules[file_path] = extract_schedule_ids(file_path)
 
-    print("Extracted Schedule IDs and Values:")
-    for file_path, schedule_data in schedules.items():
-        print(f"File: {file_path}")
-        for schedule_id, value in schedule_data.items():
-            print(f"  ScheduleID: {schedule_id}, Value: {value}")
+    common_schedule_ids = set(schedules[log_files[0]].keys())
+    for file_path in log_files[1:]:
+        common_schedule_ids.intersection_update(schedules[file_path].keys())
 
     matching_values = {}
     mismatching_values = {}
-    
-    schedule_ids_per_file = {file_path: set(schedule_data.keys()) for file_path, schedule_data in schedules.items()}
-    common_schedule_ids = set.intersection(*schedule_ids_per_file.values())
-    print("Common Schedule IDs:", common_schedule_ids)  # Debugging statement
-    
     for schedule_id in common_schedule_ids:
         values = [schedules[file_path][schedule_id] for file_path in log_files]
-        print(f"Comparing values for ScheduleID {schedule_id}: {values}")  # Debugging statement
-        if all(values):
-            if len(set(values)) == 1:
-                matching_values[schedule_id] = values[0]
-            else:
-                mismatching_values[schedule_id] = values
+        if len(set(values)) == 1:
+            matching_values[schedule_id] = values[0][0]
+        else:
+            mismatching_values[schedule_id] = values
 
-    print("Matching Values:", matching_values)  # Debugging statement
-    print("Mismatching Values:", mismatching_values)  # Debugging statement
     return matching_values, mismatching_values
 
 def write_output(matching_values, mismatching_values, output_file):
-    with open(output_file, 'w') as file:
-        print("Writing output to file...")  # Debugging statement
-        file.write("Matching Values:\n")
-        for schedule_id, value in matching_values.items():
-            file.write(f"{schedule_id}: {value}\n")
+    print("Writing output to file...")  # Debugging statement
+    output_str = ""
 
-        file.write("\nMismatching Values:\n")
-        for schedule_id, values in mismatching_values.items():
-            file.write(f"{schedule_id}: {values}\n")
+    output_str += "Matching Values:\n"
+    for schedule_id, value in matching_values.items():
+        output_str += f"{schedule_id}: {value}\n"
+
+    output_str += "\nMismatching Values:\n"
+    for schedule_id, values in mismatching_values.items():
+        output_str += f"{schedule_id}: {values}\n"
+
+    print("Output string:", output_str)  # Debugging statement
+
+    with open(output_file, 'w') as file:
+        file.write(output_str)
 
 if __name__ == "__main__":
     log_files = ["log1.txt", "log2.txt"]  # Update with your log file paths
     output_file = "output.txt"  # Update with your desired output file path
 
     matching_values, mismatching_values = compare_schedule_ids(log_files)
-    print("Matching Values:", matching_values)  # Debugging statement
-    print("Mismatching Values:", mismatching_values)  # Debugging statement
     write_output(matching_values, mismatching_values, output_file)
