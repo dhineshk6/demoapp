@@ -29,17 +29,17 @@ def compare_logs(log1_path, log2_path):
         for line in log1_file:
             schedule_id, schedule_time, month_date = parse_log_line(line)
             if schedule_id is not None:
-                log1_data.add((schedule_id, schedule_time, month_date))
+                log1_data.add((schedule_id, schedule_time))
     
     log2_data = set()
     with open(log2_path, 'r') as log2_file:
         for line in log2_file:
             schedule_id, schedule_time, month_date = parse_log_line(line)
             if schedule_id is not None:
-                log2_data.add((schedule_id, schedule_time, month_date))
+                log2_data.add((schedule_id, schedule_time))
 
-    matching = {(sid, stime) for sid, stime, _ in log1_data if (sid, stime) in log2_data}
-    mismatching = {(sid, stime) for sid, stime, _ in log1_data} ^ {(sid, stime) for sid, stime, _ in log2_data}
+    matching = log1_data.intersection(log2_data)
+    mismatching = log1_data.symmetric_difference(log2_data)
     
     return log1_data, log2_data, matching, mismatching
 
@@ -50,13 +50,13 @@ if __name__ == "__main__":
     log2_path = "path/to/log2.txt"
     log1_data, log2_data, matching, mismatching = compare_logs(log1_path, log2_path)
     
-    print("Schedule IDs, Times, Months, and Dates from File 1:")
-    for schedule_id, schedule_time, month_date in log1_data:
-        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date if month_date else 'N/A'}")
+    print("Schedule IDs and Times from File 1:")
+    for schedule_id, schedule_time, _ in log1_data:
+        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}")
 
-    print("\nSchedule IDs, Times, Months, and Dates from File 2:")
-    for schedule_id, schedule_time, month_date in log2_data:
-        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date if month_date else 'N/A'}")
+    print("\nSchedule IDs and Times from File 2:")
+    for schedule_id, schedule_time, _ in log2_data:
+        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}")
 
     print("\nMatching:")
     for schedule_id, schedule_time in matching:
