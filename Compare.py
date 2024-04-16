@@ -37,6 +37,7 @@ def compare_schedule_ids(log_files):
 
 def write_output(matching_values, mismatching_values, output_file):
     with open(output_file, 'w') as file:
+        print("Writing output to file...")  # Debugging statement
         file.write("Matching Values:\n")
         for schedule_id, value in matching_values.items():
             file.write(f"{schedule_id}: {value}\n")
