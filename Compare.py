@@ -45,8 +45,11 @@ def compare_log_files():
 
     with open(output_file, 'w') as output:
         output.write("Matching scheduled IDs and their values:\n")
-        for scheduled_id in matching_ids:
-            output.write(f"{scheduled_id}: {matching_ids[scheduled_id][0]}; {matching_ids[scheduled_id][1]}\n")
+        for scheduled_id in common_ids:
+            if scheduled_id in matching_ids:
+                output.write(f"{scheduled_id}: {matching_ids[scheduled_id][0]}; {matching_ids[scheduled_id][1]}\n")
+            else:
+                output.write(f"{scheduled_id}: {file1_data.get(scheduled_id, 'Not found')}; {file2_data.get(scheduled_id, 'Not found')}\n")
 
         output.write("\nMismatching scheduled IDs and their values from File 1:\n")
         for scheduled_id, value in mismatching_ids_file1.items():
