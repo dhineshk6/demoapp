@@ -12,9 +12,6 @@ def compare_schedules(log_files, output_file):
   matching_schedules = {}
   mismatching_schedules = {}
 
-  # Read each log file (hardcoded file paths)
-  log_files = ["path/to/log_file1.txt", "path/to/log_file2.txt", "path/to/log_file3.txt"]  # Replace with actual paths
-
   # Read each log file
   for log_file in log_files:
     with open(log_file, 'r') as f:
@@ -33,8 +30,7 @@ def compare_schedules(log_files, output_file):
     else:
       mismatching_schedules[schedule_id] = schedule_data
 
-  # Write results to output file (hardcoded path)
-  output_file = "path/to/comparison_results.txt"  # Replace with desired output path
+  # Write results to output file
   with open(output_file, 'w') as f:
     f.write("Matching Schedules:\n")
     if matching_schedules:
@@ -60,7 +56,12 @@ def parse_log_line(line):
   parts = line.strip().split(':', 1)
   return parts[0], parts[1].split(';')[0]
 
-# Run the comparison (assuming the paths are correct)
-compare_schedules(log_files, output_file)
+# Example usage (replace with your actual file paths)
+# log_files = ["path/to/log_file1.txt", "path/to/log_file2.txt", "path/to/log_file3.txt"]
+# output_file = "path/to/comparison_results.txt"
+# compare_schedules(log_files, output_file)
 
-print("Results written to", output_file)
+# Print("Results written to", output_file)
+
+# Uncomment the example usage section above and replace the file paths 
+# to run the script with your specific log files and output file.
