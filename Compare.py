@@ -59,9 +59,10 @@ if __name__ == "__main__":
         print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}")
 
     print("\nMatching:")
+    print(matching)  # Print matching set
     for schedule_id, schedule_time in matching:
         print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}")
 
     print("\nMismatching:")
-    for schedule_id, schedule_time in mismatching:
+    for schedule_id, schedule_time, _ in mismatching:
         print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}")
