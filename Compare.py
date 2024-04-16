@@ -25,8 +25,15 @@ def compare_schedule_ids(log_files):
 
     matching_values = {}
     mismatching_values = {}
-    for schedule_id in schedules[log_files[0]]:
-        values = [schedules[file_path].get(schedule_id) for file_path in log_files]
+    
+    schedule_ids = set(schedules[log_files[0]].keys())
+    for file_path in log_files[1:]:
+        schedule_ids &= set(schedules[file_path].keys())
+        
+    print("Common Schedule IDs:", schedule_ids)  # Debugging statement
+    
+    for schedule_id in schedule_ids:
+        values = [schedules[file_path][schedule_id] for file_path in log_files]
         print(f"Comparing values for ScheduleID {schedule_id}: {values}")  # Debugging statement
         if all(values):
             if len(set(values)) == 1:
