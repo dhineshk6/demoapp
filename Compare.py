@@ -4,26 +4,23 @@ def parse_log_line(line):
     """
     Parse a log line and extract schedule ID, schedule time, month, and date.
     """
-    parts = line.split('scheduleID=')
-    if len(parts) < 2:
-        return None, None, None, None
-    
-    schedule_id, rest = parts[1].split(',', 1)
-    
-    time_parts = rest.split('scheduleTime=')
-    if len(time_parts) < 2:
-        return None, None, None, None
-    
-    schedule_time, _ = time_parts[1].split(',', 1)
+    # Define regular expression patterns
+    pattern_schedule_id = r'scheduleID=(\w+),'
+    pattern_schedule_time = r'scheduleTime=(\d{2}:\d{2}:\d{2})'
+    pattern_month_date = r'(\w{3}\s+\d{1,2})'
 
-    # Extracting month and date
-    match = re.search(r'(\w{3}\s+\d{1,2})', line)
-    if match:
-        month_date = match.group(1)
-    else:
-        month_date = None
+    # Search for patterns in the line
+    match_schedule_id = re.search(pattern_schedule_id, line)
+    match_schedule_time = re.search(pattern_schedule_time, line)
+    match_month_date = re.search(pattern_month_date, line)
 
-    return schedule_id.strip(), schedule_time.strip(), month_date.strip() if month_date else 'N/A', None
+    # Extract schedule ID, schedule time, month, and date
+    schedule_id = match_schedule_id.group(1) if match_schedule_id else None
+    schedule_time = match_schedule_time.group(1) if match_schedule_time else None
+    month_date = match_month_date.group(1) if match_month_date else None
+
+    # Return extracted values
+    return schedule_id, schedule_time, month_date, None
 
 def compare_logs(log1_path, log2_path):
     """
