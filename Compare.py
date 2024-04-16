@@ -13,7 +13,7 @@ def read_log_file(file_path):
                 key_value = part.split(': ')
                 if len(key_value) == 2:
                     key, val = key_value
-                    if key.strip() == "scheduledID":
+                    if key.strip() == "scheduleID":
                         scheduled_id = val.strip()
                     elif key.strip() == "value":
                         value = val.strip()
@@ -38,14 +38,12 @@ def compare_log_files():
         matching_ids = [scheduled_id for scheduled_id in common_ids if file1_data[scheduled_id] == file2_data[scheduled_id]]
         output.write("Matching scheduled IDs and their values:\n")
         for scheduled_id in matching_ids:
-            output.write(f"{scheduled_id}: {file1_data[scheduled_id]} (Both files are matched)\n")
+            output.write(f"{scheduled_id}: {file1_data[scheduled_id]};\n")  # Ensure the output format matches input
 
         mismatching_ids = [scheduled_id for scheduled_id in common_ids if file1_data[scheduled_id] != file2_data[scheduled_id]]
         output.write("\nNot matching scheduled IDs and their values:\n")
         for scheduled_id in mismatching_ids:
-            output.write(f"{scheduled_id}: \n")
-            output.write(f"  File 1: {file1_data.get(scheduled_id, 'Not found')}\n")
-            output.write(f"  File 2: {file2_data.get(scheduled_id, 'Not found')}\n")
+            output.write(f"{scheduled_id}: {file1_data.get(scheduled_id, 'Not found')}; {file2_data.get(scheduled_id, 'Not found')};\n")  # Ensure the output format matches input
 
 # Usage example:
 compare_log_files()
