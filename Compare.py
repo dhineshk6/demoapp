@@ -22,7 +22,7 @@ def parse_log_line(line):
 
 def compare_logs(log1_path, log2_path):
     """
-    Compare two log files and identify matching and mismatching schedule IDs, times, months, and dates.
+    Compare two log files and identify matching and mismatching schedule IDs and times.
     """
     log1_data = set()
     with open(log1_path, 'r') as log1_file:
@@ -38,8 +38,8 @@ def compare_logs(log1_path, log2_path):
             if schedule_id is not None:
                 log2_data.add((schedule_id, schedule_time, month_date))
 
-    matching = log1_data.intersection(log2_data)
-    mismatching = log1_data.symmetric_difference(log2_data)
+    matching = {(sid, stime) for sid, stime, _ in log1_data if (sid, stime) in log2_data}
+    mismatching = {(sid, stime) for sid, stime, _ in log1_data} ^ {(sid, stime) for sid, stime, _ in log2_data}
     
     return log1_data, log2_data, matching, mismatching
 
@@ -59,9 +59,9 @@ if __name__ == "__main__":
         print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date if month_date else 'N/A'}")
 
     print("\nMatching:")
-    for schedule_id, schedule_time, month_date in matching:
-        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date if month_date else 'N/A'}")
+    for schedule_id, schedule_time in matching:
+        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}")
 
     print("\nMismatching:")
-    for schedule_id, schedule_time, month_date in mismatching:
-        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date if month_date else 'N/A'}")
+    for schedule_id, schedule_time in mismatching:
+        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}")
