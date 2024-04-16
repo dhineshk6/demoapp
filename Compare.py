@@ -15,17 +15,12 @@ def compare_log_files():
         try:
             with open(file_path, 'r') as file:
                 for line in file:
-                    parts = line.strip().split('[')
-                    if len(parts) > 1:
-                        schedule_part = parts[1].split(']')[0]
-                        schedule_parts = schedule_part.split('; ')
-                        for schedule in schedule_parts:
-                            schedule_pair = schedule.split(': ')
-                            if len(schedule_pair) == 2:
-                                key = schedule_pair[0].strip()
-                                value = schedule_pair[1].strip()
-                                if key == 'scheduleID':
-                                    scheduled_ids[value] = value
+                    if 'scheduleID:' in line:
+                        parts = line.strip().split(';')
+                        for part in parts:
+                            if 'scheduleID:' in part:
+                                schedule_id, value = part.strip().split(':')
+                                scheduled_ids[schedule_id.strip()] = value.strip()
         except FileNotFoundError:
             print(f"File {file_path} not found.")
         return scheduled_ids
