@@ -1,53 +1,66 @@
-def compare_log_files():
-    """
-    Compare two log files and print all matching and mismatching scheduled IDs and their values.
-    """
-    file1_path = "file1.log"  # Hardcoded file path for file 1
-    file2_path = "file2.log"  # Hardcoded file path for file 2
-    output_file = "comparison_output.txt"  # Output file path
+def compare_schedules(log_files, output_file):
+  """
+  Compares scheduleIDs and their values from multiple log files.
 
-    def read_log_file(file_path):
-        """
-        Read a log file and return a dictionary with scheduled IDs as keys and their corresponding values.
-        Exclude time, process ID, memory usage, and file descriptors from the log.
-        """
-        scheduled_ids = {}
-        try:
-            with open(file_path, 'r') as file:
-                for line in file:
-                    if 'scheduleID:' in line:
-                        parts = line.strip().split(';')
-                        for part in parts:
-                            if 'scheduleID:' in part:
-                                schedule_id, value = part.strip().split(':')
-                                scheduled_ids[schedule_id.strip()] = value.strip()
-        except FileNotFoundError:
-            print(f"File {file_path} not found.")
-        return scheduled_ids
+  Args:
+    log_files: A list of paths to the log files.
+    output_file: The path to the output text file.
+  """
 
-    file1_data = read_log_file(file1_path)
-    file2_data = read_log_file(file2_path)
-    
-    print("File 1 Data:", file1_data)
-    print("File 2 Data:", file2_data)
+  # Initialize empty dictionaries to store schedule data
+  all_schedules = {}
+  matching_schedules = {}
+  mismatching_schedules = {}
 
-    common_ids = set(file1_data.keys()) & set(file2_data.keys())
-    print("Common IDs:", common_ids)
+  # Read each log file (hardcoded file paths)
+  log_files = ["path/to/log_file1.txt", "path/to/log_file2.txt", "path/to/log_file3.txt"]  # Replace with actual paths
 
-    matching_ids = {scheduled_id for scheduled_id in common_ids if file1_data[scheduled_id] == file2_data.get(scheduled_id)}
-    print("Matching IDs:", matching_ids)
+  # Read each log file
+  for log_file in log_files:
+    with open(log_file, 'r') as f:
+      for line in f:
+        # Extract scheduleID and value from the line
+        schedule_id, value = parse_log_line(line)
+        if schedule_id not in all_schedules:
+          all_schedules[schedule_id] = {}
+        all_schedules[schedule_id][log_file] = value
 
-    mismatching_ids = common_ids - matching_ids
-    print("Mismatching IDs:", mismatching_ids)
+  # Compare schedules
+  for schedule_id, schedule_data in all_schedules.items():
+    # Check if all values are the same
+    if len(set(schedule_data.values())) == 1:
+      matching_schedules[schedule_id] = schedule_data
+    else:
+      mismatching_schedules[schedule_id] = schedule_data
 
-    with open(output_file, 'w') as output:
-        output.write("Matching scheduled IDs and their values:\n")
-        for scheduled_id in matching_ids:
-            output.write(f"{scheduled_id}: {file1_data[scheduled_id]}; {file2_data[scheduled_id]}\n")
+  # Write results to output file (hardcoded path)
+  output_file = "path/to/comparison_results.txt"  # Replace with desired output path
+  with open(output_file, 'w') as f:
+    f.write("Matching Schedules:\n")
+    if matching_schedules:
+      for schedule_id, data in matching_schedules.items():
+        f.write(f"\tScheduleID: {schedule_id}\n")
+        for log_file, value in data.items():
+          f.write(f"\t\tLog file: {log_file}, Value: {value}\n")
+    else:
+      f.write("\tNo matching schedules found.\n")
 
-        output.write("\nMismatching scheduled IDs and their values:\n")
-        for scheduled_id in mismatching_ids:
-            output.write(f"{scheduled_id}: {file1_data.get(scheduled_id, 'Not found')}; {file2_data.get(scheduled_id, 'Not found')}\n")
+    f.write("Mismatching Schedules:\n")
+    if mismatching_schedules:
+      for schedule_id, data in mismatching_schedules.items():
+        f.write(f"\tScheduleID: {schedule_id}\n")
+        for log_file, value in data.items():
+          f.write(f"\t\tLog file: {log_file}, Value: {value}\n")
+    else:
+      f.write("\tNo mismatching schedules found.\n")
 
-# Usage example:
-compare_log_files()
+# Function to parse a log line and extract scheduleID and value
+def parse_log_line(line):
+  # Extract scheduleID and value based on your format
+  parts = line.strip().split(':', 1)
+  return parts[0], parts[1].split(';')[0]
+
+# Run the comparison (assuming the paths are correct)
+compare_schedules(log_files, output_file)
+
+print("Results written to", output_file)
