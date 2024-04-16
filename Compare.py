@@ -1,32 +1,22 @@
-import gzip
-
 def read_log_file(file_path):
     """
-    Read a log file (compressed or uncompressed) and return a dictionary with scheduled IDs as keys and their corresponding values.
+    Read a log file and return a dictionary with scheduled IDs as keys and their corresponding values.
     """
     scheduled_ids = {}
-    if file_path.endswith('.gz'):
-        with gzip.open(file_path, 'rt') as file:
-            for line in file:
-                parts = line.strip().split(': ')
-                if len(parts) == 2:
-                    scheduled_id, value = parts
-                    scheduled_ids[scheduled_id] = value
-    else:
-        with open(file_path, 'r') as file:
-            for line in file:
-                parts = line.strip().split(': ')
-                if len(parts) == 2:
-                    scheduled_id, value = parts
-                    scheduled_ids[scheduled_id] = value
+    with open(file_path, 'r') as file:
+        for line in file:
+            parts = line.strip().split(': ')
+            if len(parts) == 2:
+                scheduled_id, value = parts
+                scheduled_ids[scheduled_id] = value
     return scheduled_ids
 
 def compare_log_files():
     """
-    Compare two log files (one of which can be compressed) and check if they have the same values for the scheduled IDs.
+    Compare two log files and check if they have the same values for the scheduled IDs.
     """
     file1_path = "file1.log"  # Hardcoded file path for file 1
-    file2_path = "file2.log.gz"  # Hardcoded file path for file 2 (compressed)
+    file2_path = "file2.log"  # Hardcoded file path for file 2
     output_file = "comparison_output.txt"  # Output file path
 
     with open(output_file, 'w') as output:
