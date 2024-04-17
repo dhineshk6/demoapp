@@ -31,17 +31,21 @@ def compare_logs(log1_path, log2_path):
         for line in log1_file:
             schedule_id, schedule_time, month_date = parse_log_line(line)
             if schedule_id is not None:
-                log1_data.add((schedule_id, schedule_time, month_date))
+                log1_data.add((schedule_id, schedule_time))
     
     log2_data = set()
     with open(log2_path, 'r') as log2_file:
         for line in log2_file:
             schedule_id, schedule_time, month_date = parse_log_line(line)
             if schedule_id is not None:
-                log2_data.add((schedule_id, schedule_time, month_date))
+                log2_data.add((schedule_id, schedule_time))
 
-    matching = log1_data.intersection(log2_data)
-    mismatching = log1_data.symmetric_difference(log2_data)
+    # Exclude months and dates from comparison
+    log1_data_ids_times = {(id_time[0], id_time[1]) for id_time in log1_data}
+    log2_data_ids_times = {(id_time[0], id_time[1]) for id_time in log2_data}
+
+    matching = log1_data_ids_times.intersection(log2_data_ids_times)
+    mismatching = log1_data_ids_times.symmetric_difference(log2_data_ids_times)
     
     return log1_data, log2_data, matching, mismatching
 
@@ -59,9 +63,9 @@ if __name__ == "__main__":
         print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date if month_date else 'N/A'}")
 
     print("\nMatching:")
-    for schedule_id, schedule_time, month_date in matching:
-        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date if month_date else 'N/A'}")
+    for schedule_id, schedule_time in matching:
+        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}")
 
     print("\nMismatching:")
-    for schedule_id, schedule_time, month_date in mismatching:
-        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date if month_date else 'N/A'}")
+    for schedule_id, schedule_time in mismatching:
+        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}")
