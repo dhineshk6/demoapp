@@ -1,56 +1,86 @@
 import re
 
-def extract_data_from_log(file_path):
-    schedule_data = []
-    with open(file_path, 'r') as file:
-        for line in file:
-            schedule_match = re.search(r'scheduleID:\s*(\w+);\s*time:\s*(\d{2}:\d{2}:\d{2});\s*xml:\s*(.+)', line)
-            if schedule_match:
-                schedule_id = schedule_match.group(1)
-                time = schedule_match.group(2)
-                xml_content = schedule_match.group(3)
-                schedule_data.append((schedule_id, time, xml_content))
-    return schedule_data
+def parse_log_line(line):
+    """
+    Parse a log line and extract schedule ID, schedule time, month, and date.
+    """
+    # Define regular expression patterns
+    pattern_schedule_id = r'scheduleID=(\w+),'
+    pattern_schedule_time = r'scheduleTime=(\d{2}:\d{2}:\d{2})'
+    pattern_month_date = r'(\w{3}\s+\d{1,2})'
+    pattern_xml_content = r'<data[^>]*>(.*?)<\/data>'
 
-def compare_logs(log_file1, log_file2):
-    data_file1 = extract_data_from_log(log_file1)
-    data_file2 = extract_data_from_log(log_file2)
+    # Search for patterns in the line
+    match_schedule_id = re.search(pattern_schedule_id, line)
+    match_schedule_time = re.search(pattern_schedule_time, line)
+    match_month_date = re.search(pattern_month_date, line)
+    match_xml_content = re.search(pattern_xml_content, line)
 
-    matching_data = []
-    mismatching_data = []
+    # Extract schedule ID, schedule time, month, and date
+    schedule_id = match_schedule_id.group(1) if match_schedule_id else None
+    schedule_time = match_schedule_time.group(1) if match_schedule_time else None
+    month_date = match_month_date.group(1) if match_month_date else None
+    xml_content = match_xml_content.group(1) if match_xml_content else None
 
-    for item1 in data_file1:
-        for item2 in data_file2:
-            if item1[0] == item2[0] and item1[1] == item2[1] and item1[2] == item2[2]:
-                matching_data.append((item1, item2))
-                break
-        else:
-            mismatching_data.append(item1)
+    # Return extracted values
+    return schedule_id, schedule_time, month_date, xml_content
 
-    return data_file1, data_file2, matching_data, mismatching_data
+def compare_logs(log1_path, log2_path):
+    """
+    Compare two log files and identify matching and mismatching schedule IDs, times, months, and XML content.
+    """
+    log1_data = set()
+    log1_xml = set()
+    with open(log1_path, 'r') as log1_file:
+        for line in log1_file:
+            schedule_id, schedule_time, month_date, xml_content = parse_log_line(line)
+            if schedule_id is not None:
+                log1_data.add((schedule_id, schedule_time, month_date))
+                if xml_content:
+                    log1_xml.add(xml_content)
+    
+    log2_data = set()
+    log2_xml = set()
+    with open(log2_path, 'r') as log2_file:
+        for line in log2_file:
+            schedule_id, schedule_time, month_date, xml_content = parse_log_line(line)
+            if schedule_id is not None:
+                log2_data.add((schedule_id, schedule_time, month_date))
+                if xml_content:
+                    log2_xml.add(xml_content)
 
-def output_results(file1_data, file2_data, matching_data, mismatching_data):
-    with open("output.txt", 'w') as file:
-        file.write("Data from File 1:\n")
-        for item in file1_data:
-            file.write(f"scheduleID: {item[0]}, time: {item[1]}, xml: {item[2]}\n")
-
-        file.write("\nData from File 2:\n")
-        for item in file2_data:
-            file.write(f"scheduleID: {item[0]}, time: {item[1]}, xml: {item[2]}\n")
-
-        file.write("\nMatching Data:\n")
-        for item1, item2 in matching_data:
-            file.write(f"From File 1: scheduleID: {item1[0]}, time: {item1[1]}, xml: {item1[2]}\n")
-            file.write(f"From File 2: scheduleID: {item2[0]}, time: {item2[1]}, xml: {item2[2]}\n")
-        
-        file.write("\nMismatching Data from File 1:\n")
-        for item in mismatching_data:
-            file.write(f"scheduleID: {item[0]}, time: {item[1]}, xml: {item[2]}\n")
+    matching_data = log1_data.intersection(log2_data)
+    mismatching_data = log1_data.symmetric_difference(log2_data)
+    matching_xml = log1_xml.intersection(log2_xml)
+    mismatching_xml = log1_xml.symmetric_difference(log2_xml)
+    
+    return log1_data, log1_xml, log2_data, log2_xml, matching_data, mismatching_data, matching_xml, mismatching_xml
 
 if __name__ == "__main__":
-    file1 = "file1.log"
-    file2 = "file2.log"
+    log1_path = "path/to/log1.txt"
+    log2_path = "path/to/log2.txt"
+    log1_data, log1_xml, log2_data, log2_xml, matching_data, mismatching_data, matching_xml, mismatching_xml = compare_logs(log1_path, log2_path)
+    
+    print("File 1 XML Data:")
+    for xml_content in log1_xml:
+        print(xml_content)
 
-    file1_data, file2_data, matching_data, mismatching_data = compare_logs(file1, file2)
-    output_results(file1_data, file2_data, matching_data, mismatching_data)
+    print("\nFile 2 XML Data:")
+    for xml_content in log2_xml:
+        print(xml_content)
+
+    print("\nMatching Data:")
+    for schedule_id, schedule_time, month_date in matching_data:
+        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date}")
+
+    print("\nMismatching Data:")
+    for schedule_id, schedule_time, month_date in mismatching_data:
+        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date}")
+
+    print("\nMatching XML:")
+    for xml_content in matching_xml:
+        print(xml_content)
+
+    print("\nMismatching XML:")
+    for xml_content in mismatching_xml:
+        print(xml_content)
