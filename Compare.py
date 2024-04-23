@@ -8,7 +8,7 @@ def extract_data_from_log(file_path):
         xml_content = ""
         for line in file:
             xml_content += line
-            if "<>" in line:
+            if "" in line:
                 xml_tags = re.findall(r'', xml_content, re.DOTALL)
                 for xml_tag in xml_tags:
                     xml_data.append((order_number, xml_tag))
@@ -23,6 +23,12 @@ def extract_data_from_log(file_path):
                     schedule_data.append((schedule_id, schedule_time))
     return xml_data, schedule_data
 
+def extract_sending_time(xml_tag):
+    sending_time_match = re.search(r'\d{8}-(\d{2}:\d{2}:\d{2})\.\d{3}', xml_tag)
+    if sending_time_match:
+        return sending_time_match.group(1)
+    return None
+
 def compare_logs(log_file1, log_file2):
     xml_data1, schedule_data1 = extract_data_from_log(log_file1)
     xml_data2, schedule_data2 = extract_data_from_log(log_file2)
@@ -33,13 +39,21 @@ def output_results(xml_data1, xml_data2, schedule_data1, schedule_data2, output_
     with open(output_file, 'w') as file:
         file.write("XML Tags and Schedule Information from File 1:\n")
         for order_number, xml_tag in xml_data1:
-            file.write(f"Order {order_number}: XML: {xml_tag}\n")
+            sending_time = extract_sending_time(xml_tag)
+            if sending_time:
+                file.write(f"Order {order_number}: XML: {xml_tag}, SendingTime: {sending_time}\n")
+            else:
+                file.write(f"Order {order_number}: XML: {xml_tag}\n")
         for schedule_id, schedule_time in schedule_data1:
             file.write(f"ScheduleID: {schedule_id}, ScheduleTime: {schedule_time}\n")
 
         file.write("\nXML Tags and Schedule Information from File 2:\n")
         for order_number, xml_tag in xml_data2:
-            file.write(f"Order {order_number}: XML: {xml_tag}\n")
+            sending_time = extract_sending_time(xml_tag)
+            if sending_time:
+                file.write(f"Order {order_number}: XML: {xml_tag}, SendingTime: {sending_time}\n")
+            else:
+                file.write(f"Order {order_number}: XML: {xml_tag}\n")
         for schedule_id, schedule_time in schedule_data2:
             file.write(f"ScheduleID: {schedule_id}, ScheduleTime: {schedule_time}\n")
 
@@ -47,7 +61,9 @@ def output_results(xml_data1, xml_data2, schedule_data1, schedule_data2, output_
         matching_orders = []
         mismatching_orders = []
         for (order_number1, xml1), (order_number2, xml2) in zip(xml_data1, xml_data2):
-            if xml1 == xml2:
+            sending_time1 = extract_sending_time(xml1)
+            sending_time2 = extract_sending_time(xml2)
+            if sending_time1 and sending_time2 and sending_time1.split(':')[0] == sending_time2.split(':')[0] and sending_time1.split(':')[1] == sending_time2.split(':')[1] and sending_time1.split(':')[2] == sending_time2.split(':')[2]:
                 matching_orders.append(order_number1)
             else:
                 mismatching_orders.append((order_number1, order_number2))
