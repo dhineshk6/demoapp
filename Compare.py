@@ -1,7 +1,8 @@
 import re
 
-def extract_xml_from_log(file_path):
+def extract_data_from_log(file_path):
     xml_data = []
+    schedule_data = []
     with open(file_path, 'r') as file:
         order_number = 1
         xml_content = ""
@@ -13,23 +14,34 @@ def extract_xml_from_log(file_path):
                     xml_data.append((order_number, xml_tag))
                     order_number += 1
                 xml_content = ""
-    return xml_data
+            schedule_match = re.search(r'scheduleID=(\w+)', line)
+            if schedule_match:
+                schedule_id = schedule_match.group(1)
+                time_match = re.search(r'scheduleTime=(\d{2}:\d{2}:\d{2})', line)
+                if time_match:
+                    schedule_time = time_match.group(1)
+                    schedule_data.append((schedule_id, schedule_time))
+    return xml_data, schedule_data
 
-def compare_xml(log_file1, log_file2):
-    xml_data1 = extract_xml_from_log(log_file1)
-    xml_data2 = extract_xml_from_log(log_file2)
+def compare_logs(log_file1, log_file2):
+    xml_data1, schedule_data1 = extract_data_from_log(log_file1)
+    xml_data2, schedule_data2 = extract_data_from_log(log_file2)
 
-    return xml_data1, xml_data2
+    return xml_data1, xml_data2, schedule_data1, schedule_data2
 
-def output_results(xml_data1, xml_data2, output_file):
+def output_results(xml_data1, xml_data2, schedule_data1, schedule_data2, output_file):
     with open(output_file, 'w') as file:
-        file.write("XML Tags from File 1:\n")
+        file.write("XML Tags and Schedule Information from File 1:\n")
         for order_number, xml_tag in xml_data1:
-            file.write(f"Order {order_number}: {xml_tag}\n")
+            file.write(f"Order {order_number}: XML: {xml_tag}\n")
+        for schedule_id, schedule_time in schedule_data1:
+            file.write(f"ScheduleID: {schedule_id}, ScheduleTime: {schedule_time}\n")
 
-        file.write("\nXML Tags from File 2:\n")
+        file.write("\nXML Tags and Schedule Information from File 2:\n")
         for order_number, xml_tag in xml_data2:
-            file.write(f"Order {order_number}: {xml_tag}\n")
+            file.write(f"Order {order_number}: XML: {xml_tag}\n")
+        for schedule_id, schedule_time in schedule_data2:
+            file.write(f"ScheduleID: {schedule_id}, ScheduleTime: {schedule_time}\n")
 
         file.write("\nComparison:\n")
         matching_orders = []
@@ -55,7 +67,7 @@ if __name__ == "__main__":
     file2 = "file2.log"
     output_file = "comparison_output.txt"
 
-    xml_data1, xml_data2 = compare_xml(file1, file2)
-    output_results(xml_data1, xml_data2, output_file)
+    xml_data1, xml_data2, schedule_data1, schedule_data2 = compare_logs(file1, file2)
+    output_results(xml_data1, xml_data2, schedule_data1, schedule_data2, output_file)
 
     print(f"Comparison output written to {output_file}")
