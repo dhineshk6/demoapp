@@ -14,26 +14,30 @@ def compare_xml(log_file1, log_file2):
 
     return xml_data1, xml_data2
 
-def output_results(xml_data1, xml_data2):
-    print("XML Tags from File 1:")
-    for xml_tag in xml_data1:
-        print(xml_tag)
+def output_results(xml_data1, xml_data2, output_file):
+    with open(output_file, 'w') as file:
+        file.write("XML Tags from File 1:\n")
+        for xml_tag in xml_data1:
+            file.write(xml_tag + '\n')
 
-    print("\nXML Tags from File 2:")
-    for xml_tag in xml_data2:
-        print(xml_tag)
+        file.write("\nXML Tags from File 2:\n")
+        for xml_tag in xml_data2:
+            file.write(xml_tag + '\n')
 
-    print("\nComparison:")
-    for i, (xml1, xml2) in enumerate(zip(xml_data1, xml_data2), start=1):
-        print(f"\nComparison {i}:")
-        if xml1 == xml2:
-            print("XML tags match.")
-        else:
-            print("XML tags do not match.")
+        file.write("\nComparison:\n")
+        for i, (xml1, xml2) in enumerate(zip(xml_data1, xml_data2), start=1):
+            file.write(f"\nComparison {i}:\n")
+            if xml1 == xml2:
+                file.write("XML tags match.\n")
+            else:
+                file.write("XML tags do not match.\n")
 
 if __name__ == "__main__":
     file1 = "file1.log"
     file2 = "file2.log"
+    output_file = "comparison_output.txt"
 
     xml_data1, xml_data2 = compare_xml(file1, file2)
-    output_results(xml_data1, xml_data2)
+    output_results(xml_data1, xml_data2, output_file)
+
+    print(f"Comparison output written to {output_file}")
