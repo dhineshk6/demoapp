@@ -3,9 +3,13 @@ import re
 def extract_xml_from_log(file_path):
     xml_data = []
     with open(file_path, 'r') as file:
+        xml_content = ""
         for line in file:
-            xml_tags = re.findall(r'<[^>]+>', line)  # Match XML tags
-            xml_data.extend(xml_tags)
+            xml_content += line
+            if "<>" in line:
+                xml_tags = re.findall(r'', xml_content, re.DOTALL)
+                xml_data.extend(xml_tags)
+                xml_content = ""
     return xml_data
 
 def compare_xml(log_file1, log_file2):
