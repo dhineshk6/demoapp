@@ -1,4 +1,5 @@
 import re
+import xml.etree.ElementTree as ET
 
 def parse_log_line(line):
     """
@@ -25,7 +26,19 @@ def parse_log_line(line):
     # Return extracted values
     return schedule_id, schedule_time, month_date, xml_content
 
-def compare_logs(log1_path, log2_path, output_file):
+def get_xml_data(xml_content):
+    """
+    Parse XML content and return as a string.
+    """
+    if xml_content:
+        try:
+            root = ET.fromstring(xml_content)
+            return ET.tostring(root, encoding='unicode', method='xml')
+        except ET.ParseError:
+            print("Error: Invalid XML content")
+    return None
+
+def compare_logs(log1_path, log2_path):
     """
     Compare two log files and identify matching and mismatching schedule IDs and times.
     """
@@ -46,26 +59,29 @@ def compare_logs(log1_path, log2_path, output_file):
     matching = log1_data.intersection(log2_data)
     mismatching = log1_data.symmetric_difference(log2_data)
     
-    # Write output to file
-    with open(output_file, 'w') as f:
-        f.write("Schedule IDs, Times, Months, and XML Content from File 1:\n")
-        for schedule_id, schedule_time, month_date, xml_content in log1_data:
-            f.write(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time},  XML Content: {xml_content}\n")
-
-        f.write("\nSchedule IDs, Times, Months, and XML Content from File 2:\n")
-        for schedule_id, schedule_time, month_date, xml_content in log2_data:
-            f.write(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time},  XML Content: {xml_content}\n")
-
-        f.write("\nMatching:\n")
-        for schedule_id, schedule_time, month_date, xml_content in matching:
-            f.write(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time},  XML Content: {xml_content}\n")
-
-        f.write("\nMismatching:\n")
-        for schedule_id, schedule_time, month_date, xml_content in mismatching:
-            f.write(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time},  XML Content: {xml_content}\n")
+    return log1_data, log2_data, matching, mismatching
 
 if __name__ == "__main__":
     log1_path = "path/to/log1.txt"
     log2_path = "path/to/log2.txt"
-    output_file = "output.txt"
-    compare_logs(log1_path, log2_path, output_file)
+    log1_data, log2_data, matching, mismatching = compare_logs(log1_path, log2_path)
+    
+    print("Schedule IDs, Times, Months, and XML Content from File 1:")
+    for schedule_id, schedule_time, month_date, xml_content in log1_data:
+        xml_data = get_xml_data(xml_content)
+        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date}, XML Content: {xml_data if xml_data else 'N/A'}")
+
+    print("\nSchedule IDs, Times, Months, and XML Content from File 2:")
+    for schedule_id, schedule_time, month_date, xml_content in log2_data:
+        xml_data = get_xml_data(xml_content)
+        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date}, XML Content: {xml_data if xml_data else 'N/A'}")
+
+    print("\nMatching:")
+    for schedule_id, schedule_time, month_date, xml_content in matching:
+        xml_data = get_xml_data(xml_content)
+        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date}, XML Content: {xml_data if xml_data else 'N/A'}")
+
+    print("\nMismatching:")
+    for schedule_id, schedule_time, month_date, xml_content in mismatching:
+        xml_data = get_xml_data(xml_content)
+        print(f"Schedule ID: {schedule_id}, Schedule Time: {schedule_time}, Month and Date: {month_date}, XML Content: {xml_data if xml_data else 'N/A'}")
