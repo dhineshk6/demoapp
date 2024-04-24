@@ -48,11 +48,11 @@ def output_results(xml_data1, xml_data2, schedule_data1, schedule_data2, data_bi
         for seq_no, xml_tag in xml_data1:
             sending_time = extract_sending_time(xml_tag)
             if sending_time:
-                file.write(f"Seq No: {seq_no}, XML: {xml_tag}, SendingTime: {sending_time}\n")
+                file.write(f"Seq No: {seq_no} Load in File 1, XML: {xml_tag}, SendingTime: {sending_time}\n")
             else:
-                file.write(f"Seq No: {seq_no}, XML: {xml_tag}\n")
+                file.write(f"Seq No: {seq_no} Load in File 1, XML: {xml_tag}\n")
         for seq_no, schedule_id, schedule_time in schedule_data1:
-            file.write(f"Seq No: {seq_no}, ScheduleID: {schedule_id}, ScheduleTime: {schedule_time}\n")
+            file.write(f"Seq No: {seq_no} Load in File 1, ScheduleID: {schedule_id}, ScheduleTime: {schedule_time}\n")
 
         file.write("\nData Bin Paths from File 1:\n")
         for data_bin_path in data_bin_paths1:
@@ -62,11 +62,11 @@ def output_results(xml_data1, xml_data2, schedule_data1, schedule_data2, data_bi
         for seq_no, xml_tag in xml_data2:
             sending_time = extract_sending_time(xml_tag)
             if sending_time:
-                file.write(f"Seq No: {seq_no}, XML: {xml_tag}, SendingTime: {sending_time}\n")
+                file.write(f"Seq No: {seq_no} Load in File 2, XML: {xml_tag}, SendingTime: {sending_time}\n")
             else:
-                file.write(f"Seq No: {seq_no}, XML: {xml_tag}\n")
+                file.write(f"Seq No: {seq_no} Load in File 2, XML: {xml_tag}\n")
         for seq_no, schedule_id, schedule_time in schedule_data2:
-            file.write(f"Seq No: {seq_no}, ScheduleID: {schedule_id}, ScheduleTime: {schedule_time}\n")
+            file.write(f"Seq No: {seq_no} Load in File 2, ScheduleID: {schedule_id}, ScheduleTime: {schedule_time}\n")
 
         file.write("\nData Bin Paths from File 2:\n")
         for data_bin_path in data_bin_paths2:
@@ -83,22 +83,22 @@ def output_results(xml_data1, xml_data2, schedule_data1, schedule_data2, data_bi
             found_matching = False
             for seq_no2, xml2 in xml_data2:
                 if xml1 == xml2:
-                    file.write(f"Seq No: {seq_no1} in File 1 matches Seq No: {seq_no2} in File 2\n")
+                    file.write(f"Seq No: {seq_no1} Load in File 1 matching Seq No: {seq_no2} in File 2\n")
                     found_matching = True
                     break
             if not found_matching:
-                file.write(f"Seq No: {seq_no1} in File 1 mismatching, not found in File 2\n")
+                file.write(f"Seq No: {seq_no1} Load in File 1 mismatching Seq No: {seq_no2} in File 2\n")
 
         file.write("\nScheduleID and ScheduleTime Comparison:\n")
         for seq_no1, schedule_id1, schedule_time1 in schedule_data1:
             found_matching = False
             for seq_no2, schedule_id2, schedule_time2 in schedule_data2:
                 if schedule_id1 == schedule_id2 and schedule_time1 == schedule_time2:
-                    file.write(f"Seq No: {seq_no1} ScheduleID: {schedule_id1} ScheduleTime: {schedule_time1} in File 1 matches in File 2\n")
+                    file.write(f"Seq No: {seq_no1} ScheduleID: {schedule_id1} ScheduleTime: {schedule_time1} in File 1 matching in File 2\n")
                     found_matching = True
                     break
             if not found_matching:
-                file.write(f"Seq No: {seq_no1} ScheduleID: {schedule_id1} ScheduleTime: {schedule_time1} in File 1 mismatching, not found in File 2\n")
+                file.write(f"Seq No: {seq_no1} ScheduleID: {schedule_id1} ScheduleTime: {schedule_time1} in File 1 mismatching in File 2\n")
 
 if __name__ == "__main__":
     file1 = "file1.log"
