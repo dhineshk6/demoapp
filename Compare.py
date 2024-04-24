@@ -78,6 +78,28 @@ def output_results(xml_data1, xml_data2, schedule_data1, schedule_data2, data_bi
         else:
             file.write("Data Bin Paths do not match in both files.\n")
 
+        file.write("\nXML Tag Comparison:\n")
+        for seq_no1, xml1 in xml_data1:
+            found_matching = False
+            for seq_no2, xml2 in xml_data2:
+                if xml1 == xml2:
+                    file.write(f"Seq No: {seq_no1} in File 1 matches Seq No: {seq_no2} in File 2\n")
+                    found_matching = True
+                    break
+            if not found_matching:
+                file.write(f"Seq No: {seq_no1} in File 1 mismatching, not found in File 2\n")
+
+        file.write("\nScheduleID and ScheduleTime Comparison:\n")
+        for seq_no1, schedule_id1, schedule_time1 in schedule_data1:
+            found_matching = False
+            for seq_no2, schedule_id2, schedule_time2 in schedule_data2:
+                if schedule_id1 == schedule_id2 and schedule_time1 == schedule_time2:
+                    file.write(f"Seq No: {seq_no1} ScheduleID: {schedule_id1} ScheduleTime: {schedule_time1} in File 1 matches in File 2\n")
+                    found_matching = True
+                    break
+            if not found_matching:
+                file.write(f"Seq No: {seq_no1} ScheduleID: {schedule_id1} ScheduleTime: {schedule_time1} in File 1 mismatching, not found in File 2\n")
+
 if __name__ == "__main__":
     file1 = "file1.log"
     file2 = "file2.log"
