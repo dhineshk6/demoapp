@@ -82,7 +82,7 @@ def output_results(xml_data1, xml_data2, schedule_data1, schedule_data2, data_bi
         for seq_no1, xml1 in xml_data1:
             found_matching = False
             for seq_no2, xml2 in xml_data2:
-                if xml1 == xml2:
+                if seq_no1 == seq_no2 and xml1 == xml2:
                     file.write(f"Seq No: {seq_no1} Load in File 1 matching Seq No: {seq_no2} in File 2\n")
                     found_matching = True
                     break
@@ -90,17 +90,14 @@ def output_results(xml_data1, xml_data2, schedule_data1, schedule_data2, data_bi
                 continue
             file.write(f"Seq No: {seq_no1} Load in File 1 mismatching in File 2\n")
 
-        file.write("\nScheduleID and ScheduleTime Comparison:\n")
-        for seq_no1, schedule_id1, schedule_time1 in schedule_data1:
+        for seq_no2, xml2 in xml_data2:
             found_matching = False
-            for seq_no2, schedule_id2, schedule_time2 in schedule_data2:
-                if schedule_id1 == schedule_id2 and schedule_time1 == schedule_time2:
-                    file.write(f"Seq No: {seq_no1} ScheduleID: {schedule_id1} ScheduleTime: {schedule_time1} in File 1 matching in File 2\n")
+            for seq_no1, xml1 in xml_data1:
+                if seq_no1 == seq_no2:
                     found_matching = True
                     break
-            if found_matching:
-                continue
-            file.write(f"Seq No: {seq_no1} ScheduleID: {schedule_id1} ScheduleTime: {schedule_time1} in File 1 mismatching in File 2\n")
+            if not found_matching:
+                file.write(f"Seq No: {seq_no2} Load in File 2 mismatching in File 1\n")
 
 if __name__ == "__main__":
     file1 = "file1.log"
