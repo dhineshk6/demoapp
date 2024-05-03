@@ -79,13 +79,27 @@ def output_results(xml_data1, xml_data2, schedule_data1, schedule_data2, data_bi
             file.write("Data Bin Paths do not match in both files.\n")
 
         file.write("\nXML Tag Comparison:\n")
-        for seq_no1, xml1 in xml_data1:
-            for seq_no2, xml2 in xml_data2:
-                if seq_no1 == seq_no2 and xml1.strip() == xml2.strip():
+        seq_numbers1 = set(seq_no for seq_no, _ in xml_data1)
+        seq_numbers2 = set(seq_no for seq_no, _ in xml_data2)
+
+        for seq_no1, xml_tag1 in xml_data1:
+            found_matching = False
+            for seq_no2, xml_tag2 in xml_data2:
+                if seq_no1 == seq_no2 and xml_tag1.strip() == xml_tag2.strip():
                     file.write(f"Seq No: {seq_no1} Load in File 1 matching Seq No: {seq_no2} in File 2\n")
+                    found_matching = True
                     break
-            else:
+            if not found_matching:
                 file.write(f"Seq No: {seq_no1} Load in File 1 mismatching in File 2\n")
+
+        for seq_no2, xml_tag2 in xml_data2:
+            found_matching = False
+            for seq_no1, xml_tag1 in xml_data1:
+                if seq_no1 == seq_no2 and xml_tag1.strip() == xml_tag2.strip():
+                    found_matching = True
+                    break
+            if not found_matching:
+                file.write(f"Seq No: {seq_no2} Load in File 2 mismatching in File 1\n")
 
         file.write("\nScheduleID and ScheduleTime Comparison:\n")
         for sno1, schedule_id1, schedule_time1 in schedule_data1:
