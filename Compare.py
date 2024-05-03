@@ -80,15 +80,12 @@ def output_results(xml_data1, xml_data2, schedule_data1, schedule_data2, data_bi
 
         file.write("\nXML Tag Comparison:\n")
         for seq_no1, xml1 in xml_data1:
-            found_matching = False
             for seq_no2, xml2 in xml_data2:
-                if xml1 == xml2:
+                if seq_no1 == seq_no2 and xml1.strip() == xml2.strip():
                     file.write(f"Seq No: {seq_no1} Load in File 1 matching Seq No: {seq_no2} in File 2\n")
-                    found_matching = True
                     break
-            if found_matching:
-                continue
-            file.write(f"Seq No: {seq_no1} Load in File 1 mismatching in File 2\n")
+            else:
+                file.write(f"Seq No: {seq_no1} Load in File 1 mismatching in File 2\n")
 
         file.write("\nScheduleID and ScheduleTime Comparison:\n")
         for sno1, schedule_id1, schedule_time1 in schedule_data1:
