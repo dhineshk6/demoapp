@@ -1,20 +1,19 @@
 def extract_xml_tags_after_keyword(log_file, output_file):
     with open(log_file, 'r') as infile, open(output_file, 'w') as outfile:
         lines = infile.readlines()
-        found = False
-        for i in range(len(lines) - 1):
+        recording = False
+
+        for i in range(len(lines)):
             if "Incoming XML:" in lines[i]:
-                found = True
-                # Debug: print the line with the keyword
-                print(f"Found keyword in line {i}: {lines[i].strip()}")
-                # Get the next line
-                xml_content = lines[i + 1].strip()
-                # Debug: print the XML content
-                print(f"Extracted XML content from line {i + 1}: {xml_content}")
-                # Write the next line to the output file
-                outfile.write(xml_content + '\n')
-        if not found:
-            print("No lines containing 'Incoming XML:' were found.")
+                recording = True
+                # Skip the line with the keyword
+                continue
+            
+            if recording:
+                if lines[i].strip():  # Check if the line is not empty
+                    outfile.write(lines[i])
+                else:
+                    recording = False  # Stop recording if an empty line is encountered
 
 # Usage example with Windows file paths
 log_file = r'C:\path\to\your\logfile.log'
