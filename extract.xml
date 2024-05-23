@@ -1,22 +1,38 @@
 import re
 
-def extract_xml_tags_after_keyword(log_file, output_file):
+def extract_and_print_xml_tags(log_file, output_file):
     with open(log_file, 'r') as infile, open(output_file, 'w') as outfile:
-        recording = False
+        recording_incoming = False
+        recording_input = False
 
         for line in infile:
+            # Check for the "Incoming XML:" keyword to start recording
             if "Incoming XML:" in line:
-                recording = True
+                recording_incoming = True
                 continue
 
-            if recording:
+            # Check for the "Input XML" keyword to start recording
+            if "Input XML" in line:
+                recording_input = True
+                continue
+
+            if recording_incoming:
                 # Check if the line contains XML tags using regular expressions
                 if re.search(r'<.*?>', line):
                     outfile.write(line.strip() + '\n')
                 else:
-                    recording = False
+                    # Stop recording if no XML tag is found in the line
+                    recording_incoming = False
+
+            if recording_input:
+                # Check if the line contains XML tags and the keyword 'abc12345678'
+                if re.search(r'<.*?>', line) and 'abc12345678' in line:
+                    print(line.strip())
+                else:
+                    # Stop recording if no XML tag is found in the line
+                    recording_input = False
 
 # Usage example with Windows file paths
 log_file = r'C:\path\to\your\logfile.log'
 output_file = r'C:\path\to\your\outputfile.xml'
-extract_xml_tags_after_keyword(log_file, output_file)
+extract_and_print_xml_tags(log_file, output_file)
