@@ -6,14 +6,14 @@ def extract_xml_tags_after_keyword(log_file, output_file):
         for i in range(len(lines)):
             if "Incoming XML:" in lines[i]:
                 recording = True
-                # Skip the line with the keyword
                 continue
             
             if recording:
-                if lines[i].strip():  # Check if the line is not empty
-                    outfile.write(lines[i])
-                else:
-                    recording = False  # Stop recording if an empty line is encountered
+                if lines[i].strip() == "":
+                    recording = False
+                    continue
+                
+                outfile.write(lines[i])
 
 # Usage example with Windows file paths
 log_file = r'C:\path\to\your\logfile.log'
