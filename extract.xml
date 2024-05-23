@@ -9,10 +9,12 @@ def extract_xml_tags_after_keyword(log_file, output_file):
                 continue
             
             if recording:
+                # Stop recording when an empty line is encountered
                 if lines[i].strip() == "":
                     recording = False
                     continue
-                
+
+                # Write the line to the output file if it contains XML tags
                 outfile.write(lines[i])
 
 # Usage example with Windows file paths
