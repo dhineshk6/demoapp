@@ -1,21 +1,20 @@
+import re
+
 def extract_xml_tags_after_keyword(log_file, output_file):
     with open(log_file, 'r') as infile, open(output_file, 'w') as outfile:
-        lines = infile.readlines()
         recording = False
 
-        for i in range(len(lines)):
-            if "Incoming XML:" in lines[i]:
+        for line in infile:
+            if "Incoming XML:" in line:
                 recording = True
                 continue
-            
-            if recording:
-                # Stop recording when an empty line is encountered
-                if lines[i].strip() == "":
-                    recording = False
-                    continue
 
-                # Write the line to the output file if it contains XML tags
-                outfile.write(lines[i])
+            if recording:
+                # Check if the line contains XML tags using regular expressions
+                if re.search(r'<.*?>', line):
+                    outfile.write(line.strip() + '\n')
+                else:
+                    recording = False
 
 # Usage example with Windows file paths
 log_file = r'C:\path\to\your\logfile.log'
