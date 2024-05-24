@@ -1,6 +1,17 @@
 import re
 import os
 
+def wrap_with_soap_envelope(xml_content):
+    soap_template = f"""
+    <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:web="http://example.com/webservices">
+        <soapenv:Header/>
+        <soapenv:Body>
+            {xml_content}
+        </soapenv:Body>
+    </soapenv:Envelope>
+    """
+    return soap_template.strip()
+
 def extract_and_process_log(log_file, output_file, output_dir):
     with open(log_file, 'r') as infile, open(output_file, 'w') as outfile:
         recording_incoming = False
@@ -51,10 +62,15 @@ def extract_and_process_log(log_file, output_file, output_dir):
                     recording_abc_segment = False
                     # Check if the segment contains 'abc12345678'
                     if any('abc12345678' in segment_line for segment_line in abc_segment):
+                        print(f"Saving segment #{segment_count + 1}")
                         segment_count += 1
+                        xml_content = ''.join(abc_segment).strip()
+                        soap_message = wrap_with_soap_envelope(xml_content)
                         segment_filename = os.path.join(output_dir, f'segment_{segment_count}.xml')
                         with open(segment_filename, 'w') as segment_file:
-                            segment_file.writelines(abc_segment)
+                            segment_file.write(soap_message)
+                    else:
+                        print(f"Segment #{segment_count + 1} does not contain 'abc12345678'")
 
 # Usage example with Windows file paths
 log_file = r'C:\path\to\your\logfile.log'
