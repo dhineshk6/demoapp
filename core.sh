@@ -19,12 +19,27 @@ if [ $? -ne 0 ]; then
     exit 2
 fi
 
-# Run the deletion command on the remote host via SSH
+# Run the command to list and delete .core files on the remote host via SSH
 ssh "$HOSTNAME" "
     if [ -d '$TARGET_DIR' ]; then
-        echo 'Deleting .core files in $TARGET_DIR...'
-        find '$TARGET_DIR' -type f -name '*.core' -exec rm -f {} \;
-        echo 'Deletion complete.'
+        echo 'Listing .core files in $TARGET_DIR:'
+        # List the .core files in the directory
+        core_files=\$(find '$TARGET_DIR' -type f -name '*.core')
+        if [ -n '\$core_files' ]; then
+            echo '\$core_files'
+            # Ask for user confirmation before deleting
+            read -p 'Do you want to delete these files? (y/n): ' confirm
+            if [ '\$confirm' == 'y' ] || [ '\$confirm' == 'Y' ]; then
+                echo 'Deleting .core files...'
+                # Delete the .core files
+                find '$TARGET_DIR' -type f -name '*.core' -exec rm -f {} \;
+                echo 'Deletion complete.'
+            else
+                echo 'Deletion cancelled.'
+            fi
+        else
+            echo 'No .core files found in $TARGET_DIR.'
+        fi
     else
         echo 'Directory $TARGET_DIR does not exist on $HOSTNAME.'
     fi
