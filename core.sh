@@ -22,22 +22,18 @@ fi
 # Run the command to list and delete .core files on the remote host via SSH
 ssh "$HOSTNAME" << EOF
     if [ -d '$TARGET_DIR' ]; then
-        echo 'Listing .core files in $TARGET_DIR:'
-        # List the .core files in the directory
+        echo 'Listing .core files in $TARGET_DIR with sizes:'
+        # List the .core files with their sizes using ls -lh
         core_files=\$(find '$TARGET_DIR' -type f -name '*.core')
         if [ -n "\$core_files" ]; then
-            echo "\$core_files"
-            # Ask for user confirmation before deleting
-            echo -n "Do you want to delete these files? (y/n): "
-            read confirm
-            if [ "\$confirm" == "y" ] || [ "\$confirm" == "Y" ]; then
-                echo 'Deleting .core files...'
-                # Delete the .core files
-                echo "\$core_files" | xargs rm -f
-                echo 'Deletion complete.'
-            else
-                echo 'Deletion cancelled.'
-            fi
+            echo "\$core_files" | while read -r file; do
+                # Show file sizes using ls -lh
+                ls -lh "\$file"
+            done
+            # Automatically delete the .core files
+            echo 'Deleting .core files...'
+            echo "\$core_files" | xargs rm -f
+            echo 'Deletion complete.'
         else
             echo 'No .core files found in $TARGET_DIR.'
         fi
