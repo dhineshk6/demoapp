@@ -32,7 +32,7 @@ ssh "$HOSTNAME" "
             if [ '\$confirm' == 'y' ] || [ '\$confirm' == 'Y' ]; then
                 echo 'Deleting .core files...'
                 # Delete the .core files
-                find '$TARGET_DIR' -type f -name '*.core' -exec rm -f {} \;
+                echo '\$core_files' | xargs rm -f
                 echo 'Deletion complete.'
             else
                 echo 'Deletion cancelled.'
